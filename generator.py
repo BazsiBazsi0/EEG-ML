@@ -1,10 +1,6 @@
 import os
 import numpy as np
 import mne
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import minmax_scale
 
 
 # This class generates files to be used for loading later on

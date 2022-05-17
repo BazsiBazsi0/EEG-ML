@@ -1,104 +1,11 @@
-import os
-from pathlib import Path
 import numpy as np
-import mne
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import minmax_scale
+import loader
 
 
 class SubjectsClass:
-    def __init__(self, debug, subject_s={}, subject_names=[], recordings={}, subj_single=''):
-        self.debug = None
-
-    @staticmethod
-    def list_files(self):
-        # This only lists files in cwd
-        # prints the files found
-        # maybe use for sanity check later
-        path_of_the_directory = os.getcwd()
-        # path_of_the_directory= 'EEG_Physionet'
-        print("Files and directories in a specified path:")
-        for filename in os.listdir(path_of_the_directory):
-            f = os.path.join(path_of_the_directory, filename)
-            if os.path.isfile(f):
-                print(f)
-
-    @staticmethod
-    def read_dir_files(self):
-        # this reads in folders and files
-        # python 3.5 style with scandir
-        # the files & dirs in the root(current working dir) are saved in arrays
-        # prints the dirs found, but the object are not simple strings
-        # I can't make use of it currently
-
-        folders = []
-        folder_paths = []
-        files = []
-        for entry in os.scandir(os.getcwd()):
-            if entry.is_dir():
-                folders.append(entry)
-                folder_paths.append(entry.path)
-            elif entry.is_file():
-                files.append(entry.path)
-        print('Folders:')
-        for f in folders:
-            print(f)
-
-    def dir_list(self):
-        # this takes the list of dirs and put them into a list
-        dirlist = [item for item in os.listdir(os.getcwd()) if os.path.isdir(os.path.join(os.getcwd(), item))]
-
-        if self.debug:
-            print(dirlist)
-
-        return dirlist
-
-    def open_subj_files(self, subj_single):
-        # This lists the files in certain subject dir, filters *.edf files for safety
-        source_dir = Path(subj_single)
-        filelist = os.listdir(source_dir)
-
-        for f in filelist:
-            raw = mne.io.read_raw_edf(f)
-            events, event_dict = mne.events_from_annotations(raw)
-            event_dict = dict(rest=1, left=2, right=3)
-            epochs = mne.Epochs(raw, events, event_id=event_dict, tmin=0, tmax=4, baseline=None)
-
-        # below is file processing if needed in any case
-        """
-        files = source_dir.glob('*.edf')
-        for file in files:
-            with file.open('r') as file_handle:
-                for single_file in file_handle:
-                    # do your thing
-                    yield single_file
-        """
-
-        if self.debug:
-            print(filelist)
-
-        return 0
-
-    # TODO redundant lines
-    @staticmethod
-    def loader():
-        # load the saved files
-        exclude = [38, 88, 89, 92, 100, 104]
-        subjects = [n for n in np.arange(1, 50) if n not in exclude]
-        xs = list()
-        ys = list()
-        data_x = list()
-        data_y = list()
-        for s in subjects:
-            xs.append(np.load("test_generate2/first_gen/" + "x" + "_sub_" + str(s) + ".npy"))
-            ys.append(np.load("test_generate2/first_gen/" + "y" + "_sub_" + str(s) + ".npy"))
-
-        data_x.append(np.concatenate(xs))
-        data_y.append(np.concatenate(ys))
-
-        return np.concatenate(data_x), np.concatenate(data_y)
 
     # stolen-onehot to test the process
     # TODO rewrite this block+investigate
@@ -120,9 +27,9 @@ class SubjectsClass:
         return tf.keras.utils.to_categorical(new_array)
 
 
-x, y = SubjectsClass.loader()
+x, y = loader.load_saved_files()
 print(np.shape(x), np.shape(y))  # x = (8640, 2, 641) y = (8640,)
-# TODO ask AA about how to check my data at this point, maybe scatterplot
+# TODO ask AA about how to check my data at this point, maybe scatter plot
 # TODO onehot
 # TODO reshape/scale
 # Transform y to one-hot-encoding
