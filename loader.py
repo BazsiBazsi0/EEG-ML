@@ -1,11 +1,7 @@
-import main
-import os
-import sys
 import numpy as np
-import tensorflow as tf
 
 
-class loader:
+class FileLoader:
 
     # TODO redundant lines
     @staticmethod
