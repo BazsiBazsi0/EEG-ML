@@ -60,19 +60,19 @@ class Generator:
                 if int(run) in task2:
                     for index, an in enumerate(raw_run.annotations.description):
                         if an == "T0":
-                            raw_run.annotations.description[index] = "re"
+                            raw_run.annotations.description[index] = "re"   # Rest
                         if an == "T1":
-                            raw_run.annotations.description[index] = "le"
+                            raw_run.annotations.description[index] = "le"   # Left
                         if an == "T2":
-                            raw_run.annotations.description[index] = "ri"
+                            raw_run.annotations.description[index] = "ri"   # Right
                 if int(run) in task4:
                     for index, an in enumerate(raw_run.annotations.description):
                         if an == "T0":
-                            raw_run.annotations.description[index] = "re"
+                            raw_run.annotations.description[index] = "re"   # Rest
                         if an == "T1":
-                            raw_run.annotations.description[index] = "fi"
+                            raw_run.annotations.description[index] = "fi"   # Fists
                         if an == "T2":
-                            raw_run.annotations.description[index] = "fe"
+                            raw_run.annotations.description[index] = "fe"   # Feet
                 single_subject_run.append(raw_run)
             all_subject_list.append(single_subject_run)
         # returns with type list[list[mne.io.BaseRaw]], i commented it out beacuse we need to concatenate and del annot
