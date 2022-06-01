@@ -39,7 +39,10 @@ class NeuralNets:
         kernel_size_0 = 20
         kernel_size_1 = 6
         drop_rate = 0.5
-
+        # it wants to have 20512 as input if i include all the ch-s, makes no sense it should have 641 x 64 or similar
+        # M x N M: length of the time window(160 x 4)
+        #       N: number of EEG ch-s
+        # with only one pair of electrodes it requires 641x2
         inputs = tf.keras.Input(shape=(641, 2))
         conv1 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="same")(inputs)
         batch_n_1 = tf.keras.layers.BatchNormalization()(conv1)
@@ -65,7 +68,7 @@ class NeuralNets:
         return tf.keras.Model(inputs, out)
 
     @staticmethod
-    def bad_net():
+    def simplifed_starter_net():
         kernel_size_0 = 20
         kernel_size_1 = 6
         drop_rate = 0.5
@@ -93,6 +96,16 @@ class NeuralNets:
         out = tf.keras.layers.Dense(5, activation='softmax')(dense3)
 
         return tf.keras.Model(inputs, out)
+
+    # Next evolution step after AlexNet, is addresses the depth issue and implements various other improvements.
+    # Created by the Visual Geometry Group (University of Oxford)
+    # 92.7% top-5 test accuracy in ImageNet
+    # TODO needs 2D input
+    @staticmethod
+    def VGG_net_16():
+        inputs = tf.keras.Input(shape=(641, 2))
+        conv1 = tf.keras.layers.Conv2D(filters=64,kernel_size=(3,3),padding="same", activation="relu")
+        return 0
 
     # TODO Extend this s little bit add more metrics
     # Something fishy is going on, reimplement Ch-s fully and check again
