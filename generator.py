@@ -15,7 +15,7 @@ class Generator:
         The function returns:
             xs: Time series of the data with a shape of(n_sample, 64, 641)
             y: The list of labels with a length of n_samples
-            ch_names: 64 channels in the xs array
+            ch_names: The 64 channels in the xs array
         """
 
         # The imaginary runs for indexing purposes
@@ -59,7 +59,6 @@ class Generator:
             F indicates motor imagination of opening and closing both feet.
             I want to figure out why the indexes are only accepting two chars
             Looks like the annotation description of the raw runs have <u2(2 char unicode) dtype: {dtype[str_]:()} <U2
-            Very upsetting since we dont get any errors if we want to assign a longer string to them
             """
 
             """

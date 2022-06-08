@@ -37,14 +37,26 @@ class NeuralNets:
         return x_res, y_res
 
     @staticmethod
+    def basic_net():
+        inputs = tf.keras.Input(shape=(641, 64))
+        spacing = visualkeras.SpacingDummyLayer(spacing=100)(inputs)
+        conv1 = tf.keras.layers.Conv1D(filters=64, kernel_size=2, activation='relu', padding="same")(spacing)
+        dense1 = tf.keras.layers.Dense(16, activation='relu')(conv1)
+        mpool1d = tf.keras.layers.MaxPooling1D()(dense1)
+        flat = tf.keras.layers.Flatten()(mpool1d)
+        out = tf.keras.layers.Dense(3, activation='softmax')(flat)
+
+        return tf.keras.Model(inputs, out)
+
+    @staticmethod
     def starter_net():
         kernel_size_0 = 20
         kernel_size_1 = 6
         drop_rate = 0.5
-        # it wants to have 20512 as input if i include all the ch-s, makes no sense it should have 641 x 64 or similar
+        # 20512 is the input if i include all the ch-s
         # M x N M: length of the time window(160 x 4)
         #       N: number of EEG ch-s
-        # with only one pair of electrodes it requires 641x2
+        # with only one pair of electrodes it requires 641x2, with all the electrodes: 641x64
         inputs = tf.keras.Input(shape=(641, 2))
         spacing = visualkeras.SpacingDummyLayer(spacing=100)(inputs)
 
@@ -109,8 +121,16 @@ class NeuralNets:
     # TODO needs 2D input
     @staticmethod
     def VGG_net_16():
-        inputs = tf.keras.Input(shape=(641, 2))
-        conv1 = tf.keras.layers.Conv2D(filters=64,kernel_size=(3,3),padding="same", activation="relu")
+        inputs = tf.keras.Input(shape=(64, 641))
+        tf.keras.applications.VGG16(
+            include_top=True,
+            weights="imagenet",
+            input_tensor=None,
+            input_shape=None,
+            pooling=None,
+            classes=1000,
+            classifier_activation="softmax",
+        )
         return 0
 
     # TODO fix

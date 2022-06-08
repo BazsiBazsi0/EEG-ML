@@ -13,9 +13,8 @@ class FileLoader:
         all_subjects = list()
 
         # load until max subject number reached
-        subjects = np.arange(1, max_subjects)
-        for subject_number in subjects:
-            with open(os.path.join(path, subject_number + ".pkl"), "rb") as file:
+        for subject_number in range(1, max_subjects + 1):
+            with open(os.path.join(path, str(subject_number) + ".pkl"), "rb") as file:
                 all_subjects.append(pickle.load(file))
                 # each file is a numpy array:
                 # [[n_task, channels, time], list of labels, ch_names]
@@ -35,31 +34,27 @@ class FileLoader:
         # couples_mapping = [[channels_mapping[couple[0]], channels_mapping[couple[1]]] for couple in couples]
 
         # I changed the order of the encoding
-        one_hot_encoding = {'rest':         np.array([1.0, 0.0, 0.0, 0.0, 0.0]),
-                            'both_feet':    np.array([0.0, 1.0, 0.0, 0.0, 0.0]),
-                            'left_hand':    np.array([0.0, 0.0, 1.0, 0.0, 0.0]),
-                            'both_hands':   np.array([0.0, 0.0, 0.0, 1.0, 0.0]),
-                            'right_hand':   np.array([0.0, 0.0, 0.0, 0.0, 1.0])}
+        one_hot_encoding = {'rest': np.array([1.0, 0.0, 0.0, 0.0, 0.0]),
+                            'both_feet': np.array([0.0, 1.0, 0.0, 0.0, 0.0]),
+                            'left_hand': np.array([0.0, 0.0, 1.0, 0.0, 0.0]),
+                            'both_hands': np.array([0.0, 0.0, 0.0, 1.0, 0.0]),
+                            'right_hand': np.array([0.0, 0.0, 0.0, 0.0, 1.0])}
 
+        # Random generator for assigning to test and train set
         random = numpy.random.default_rng(42)
 
         x_train_raw, y_train_raw, x_test_raw, y_test_raw = list(), list(), list(), list()
-        # train
-        # TODO make a revision to this part
+        subj_counter = 0
         for sub in all_subjects:
-            for trial in range(len(sub[0])):
-                if random.random() > 0.3:
-                    for couple in couples_mapping:
-                        x_train_raw.append(np.array([sub[0][trial, couple[0], :],
-                                                     sub[0][trial, couple[1], :]]))
-
-                        y_train_raw.append(one_hot_encoding[sub[1][trial]])
-                else:
-                    for couple in couples_mapping:
-                        x_test_raw.append(np.array([sub[0][trial, couple[0], :],
-                                                    sub[0][trial, couple[1], :]]))
-
-                        y_test_raw.append(one_hot_encoding[sub[1][trial]])
+            subj_counter = subj_counter+1
+            if subj_counter < 10:
+                for trial in range(len(sub[0])):
+                    x_train_raw.append(np.array(sub[0][trial, :, :]))
+                    y_train_raw.append(one_hot_encoding[sub[1][trial]])
+            else:
+                for trial in range(len(sub[0])):
+                    x_test_raw.append(np.array(sub[0][trial, :, :]))
+                    y_test_raw.append(one_hot_encoding[sub[1][trial]])
         return np.array(x_train_raw), np.array(y_train_raw), np.array(x_test_raw), np.array(y_test_raw)
 
     @staticmethod

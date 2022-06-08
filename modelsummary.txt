@@ -2,50 +2,22 @@ Model: "model"
 ________________________________________________________________________________________________________________________
  Layer (type)                                         Output Shape                                    Param #           
 ========================================================================================================================
- input_1 (InputLayer)                                 [(None, 641, 2)]                                0                 
+ input_1 (InputLayer)                                 [(None, 641, 64)]                               0                 
                                                                                                                         
- spacing_dummy_layer (SpacingDummyLayer)              (None, 641, 2)                                  0                 
+ spacing_dummy_layer (SpacingDummyLayer)              (None, 641, 64)                                 0                 
                                                                                                                         
- conv1d (Conv1D)                                      (None, 641, 32)                                 1312              
+ conv1d (Conv1D)                                      (None, 641, 64)                                 8256              
                                                                                                                         
- batch_normalization (BatchNormalization)             (None, 641, 32)                                 128               
+ dense (Dense)                                        (None, 641, 16)                                 1040              
                                                                                                                         
- conv1d_1 (Conv1D)                                    (None, 622, 32)                                 20512             
+ max_pooling1d (MaxPooling1D)                         (None, 320, 16)                                 0                 
                                                                                                                         
- batch_normalization_1 (BatchNormalization)           (None, 622, 32)                                 128               
+ flatten (Flatten)                                    (None, 5120)                                    0                 
                                                                                                                         
- spatial_dropout1d (SpatialDropout1D)                 (None, 622, 32)                                 0                 
-                                                                                                                        
- conv1d_2 (Conv1D)                                    (None, 617, 32)                                 6176              
-                                                                                                                        
- spacing_dummy_layer_1 (SpacingDummyLayer)            (None, 617, 32)                                 0                 
-                                                                                                                        
- average_pooling1d (AveragePooling1D)                 (None, 308, 32)                                 0                 
-                                                                                                                        
- conv1d_3 (Conv1D)                                    (None, 303, 32)                                 6176              
-                                                                                                                        
- spatial_dropout1d_1 (SpatialDropout1D)               (None, 303, 32)                                 0                 
-                                                                                                                        
- spacing_dummy_layer_2 (SpacingDummyLayer)            (None, 303, 32)                                 0                 
-                                                                                                                        
- flatten (Flatten)                                    (None, 9696)                                    0                 
-                                                                                                                        
- dense (Dense)                                        (None, 296)                                     2870312           
-                                                                                                                        
- dropout (Dropout)                                    (None, 296)                                     0                 
-                                                                                                                        
- dense_1 (Dense)                                      (None, 148)                                     43956             
-                                                                                                                        
- dropout_1 (Dropout)                                  (None, 148)                                     0                 
-                                                                                                                        
- dense_2 (Dense)                                      (None, 74)                                      11026             
-                                                                                                                        
- dropout_2 (Dropout)                                  (None, 74)                                      0                 
-                                                                                                                        
- dense_3 (Dense)                                      (None, 5)                                       375               
+ dense_1 (Dense)                                      (None, 3)                                       15363             
                                                                                                                         
 ========================================================================================================================
-Total params: 2,960,101
-Trainable params: 2,959,973
-Non-trainable params: 128
+Total params: 24,659
+Trainable params: 24,659
+Non-trainable params: 0
 ________________________________________________________________________________________________________________________
