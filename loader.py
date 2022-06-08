@@ -7,28 +7,22 @@ import os
 class FileLoader:
 
     @staticmethod
-    def load_saved_files_new():
-        """
-        Before running this generate the data with generator_fix.py
-        """
-
+    def load_saved_files_new(max_subjects: int):
         path = "dataset/sub_by_sub_motor_imagery"
 
-        exclude = [38, 88, 89, 92, 100, 104]
-        subjects = [str(n) for n in np.arange(1, 110) if n not in exclude]
+        all_subjects = list()
 
-        all_subs = list()
-
+        # load until max subject number reached
+        subjects = np.arange(1, max_subjects)
         for subject_number in subjects:
             with open(os.path.join(path, subject_number + ".pkl"), "rb") as file:
-                all_subs.append(pickle.load(file))
-                # each file is composed as follows:
-                # [numpy array [n_task, channels, time], list of labels, ch_names]
+                all_subjects.append(pickle.load(file))
+                # each file is a numpy array:
+                # [[n_task, channels, time], list of labels, ch_names]
 
-        channels_mapping = {name: index for name, index in
-                            zip(all_subs[0][2], range(len(all_subs[0][2])))}
+        # channels_mapping = {name: index for name, index in zip(all_subjects[0][2], range(len(all_subjects[0][2])))}
 
-        couples = [["FC1", "FC2"],
+        """couples = [["FC1", "FC2"],
                    ["FC3", "FC4"],
                    ["FC5", "FC6"],
                    ["C5", "C6"],
@@ -36,21 +30,23 @@ class FileLoader:
                    ["C1", "C2"],
                    ["CP1", "CP2"],
                    ["CP3", "CP4"],
-                   ["CP5", "CP6"]]
+                   ["CP5", "CP6"]]"""
 
-        couples_mapping = [[channels_mapping[couple[0]],
-                            channels_mapping[couple[1]]] for couple in couples]
+        # couples_mapping = [[channels_mapping[couple[0]], channels_mapping[couple[1]]] for couple in couples]
 
-        one_hot_encoding = {"R": np.array([1.0, 0.0, 0.0, 0.0, 0.0]),
-                            "L": np.array([0.0, 1.0, 0.0, 0.0, 0.0]),
-                            "LR": np.array([0.0, 0.0, 1.0, 0.0, 0.0]),
-                            "F": np.array([0.0, 0.0, 0.0, 1.0, 0.0]),
-                            "B": np.array([0.0, 0.0, 0.0, 0.0, 1.0])}
+        # I changed the order of the encoding
+        one_hot_encoding = {'rest':         np.array([1.0, 0.0, 0.0, 0.0, 0.0]),
+                            'both_feet':    np.array([0.0, 1.0, 0.0, 0.0, 0.0]),
+                            'left_hand':    np.array([0.0, 0.0, 1.0, 0.0, 0.0]),
+                            'both_hands':   np.array([0.0, 0.0, 0.0, 1.0, 0.0]),
+                            'right_hand':   np.array([0.0, 0.0, 0.0, 0.0, 1.0])}
 
         random = numpy.random.default_rng(42)
 
         x_train_raw, y_train_raw, x_test_raw, y_test_raw = list(), list(), list(), list()
-        for sub in all_subs:
+        # train
+        # TODO make a revision to this part
+        for sub in all_subjects:
             for trial in range(len(sub[0])):
                 if random.random() > 0.3:
                     for couple in couples_mapping:
@@ -64,7 +60,7 @@ class FileLoader:
                                                     sub[0][trial, couple[1], :]]))
 
                         y_test_raw.append(one_hot_encoding[sub[1][trial]])
-        return x_train_raw, y_train_raw, x_test_raw, y_test_raw
+        return np.array(x_train_raw), np.array(y_train_raw), np.array(x_test_raw), np.array(y_test_raw)
 
     @staticmethod
     def load_saved_files():
