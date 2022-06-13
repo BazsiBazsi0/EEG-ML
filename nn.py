@@ -2,6 +2,8 @@ import numpy as np
 import tensorflow as tf
 from imblearn.over_sampling import SMOTE
 from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+
 
 class NeuralNets:
 
@@ -31,8 +33,8 @@ class NeuralNets:
     @staticmethod
     def smote_processor(x, y):
         sm = SMOTE(random_state=42)
-        sm.fit_resample(x, y)
-        return x,y
+        x_resampled, y_resampled = sm.fit_resample(x, y)
+        return x_resampled, y_resampled
 
     @staticmethod
     def starter_net():
@@ -40,7 +42,7 @@ class NeuralNets:
         kernel_size_1 = 6
         drop_rate = 0.5
 
-        inputs = tf.keras.Input(shape=(641, 2))
+        inputs = tf.keras.Input(shape=(641, 64))
         conv1 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="same")(inputs)
         batch_n_1 = tf.keras.layers.BatchNormalization()(conv1)
         conv2 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="valid")(
@@ -76,38 +78,66 @@ class NeuralNets:
         conv2 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="valid")(
             batch_n_1)
         batch_n_2 = tf.keras.layers.BatchNormalization()(conv2)
-        #spatial_drop1 = tf.keras.layers.SpatialDropout1D(drop_rate)(batch_n_2)
+        # spatial_drop1 = tf.keras.layers.SpatialDropout1D(drop_rate)(batch_n_2)
         conv3 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_1, activation='relu', padding="valid")(
             batch_n_2)
         avg_pool1 = tf.keras.layers.AvgPool1D(pool_size=2)(conv3)
         conv4 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_1, activation='relu', padding="valid")(
             avg_pool1)
-        #spatial_drop_2 = tf.keras.layers.SpatialDropout1D(drop_rate)(conv4)
+        # spatial_drop_2 = tf.keras.layers.SpatialDropout1D(drop_rate)(conv4)
         flat = tf.keras.layers.Flatten()(conv4)
         dense1 = tf.keras.layers.Dense(296, activation='relu')(flat)
-        #dropout1 = tf.keras.layers.Dropout(drop_rate)(dense1)
+        # dropout1 = tf.keras.layers.Dropout(drop_rate)(dense1)
         dense2 = tf.keras.layers.Dense(148, activation='relu')(dense1)
-        #dropout2 = tf.keras.layers.Dropout(drop_rate)(dense2)
+        # dropout2 = tf.keras.layers.Dropout(drop_rate)(dense2)
         dense3 = tf.keras.layers.Dense(74, activation='relu')(dense2)
-        #dropout3 = tf.keras.layers.Dropout(drop_rate)(dense3)
+        # dropout3 = tf.keras.layers.Dropout(drop_rate)(dense3)
         out = tf.keras.layers.Dense(5, activation='softmax')(dense3)
 
         return tf.keras.Model(inputs, out)
 
-    # TODO Extend this s little bit add more metrics
-    # Something fishy is going on, reimplement Ch-s fully and check again
     @staticmethod
     def metrics_generation(model, x_test, y_test):
         y_predict = model.predict(x_test)
 
         # convert from one hot encode in string
         y_test_class = np.argmax(y_test, axis=1)
-        y_predicted_class = np.argmax(y_predict, axis=1)
+        y_predicted_classes = np.argmax(y_predict, axis=1)
 
         print('Classification report: ')
-        print(classification_report(y_test_class, y_predicted_class))
+        print(classification_report(y_test_class, y_predicted_classes))
         #                            target_names=["rest", "left", "right", "fists", "feet"]))
 
         print('Confusion matrix: ')
 
-        print(confusion_matrix(y_test_class, y_predicted_class))
+        print(confusion_matrix(y_test_class, y_predicted_classes))
+
+    @staticmethod
+    def save_accuracy_curves(history, number_of_epochs, filename):
+        acc = history.history["accuracy"]
+        val_acc = history.history["val_accuracy"]
+        loss = history.history["loss"]
+        val_loss = history.history["val_loss"]
+
+        epochs_range = range(number_of_epochs)
+
+        fig = plt.figure(figsize=(12, 6))
+
+        plt.subplot(1, 2, 1)
+        plt.plot(epochs_range, acc, label="train accuracy")
+        plt.plot(epochs_range, val_acc, label="validation accuracy")
+        plt.title("Accuracy")
+        plt.xlabel("Epoch")
+        plt.ylabel("Accuracy")
+        plt.legend(loc="lower right")
+
+        plt.subplot(1, 2, 2)
+        plt.plot(epochs_range, loss, label="train loss")
+        plt.plot(epochs_range, val_loss, label="validation loss")
+        plt.title("Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.legend(loc="upper right")
+
+        fig.tight_layout()
+        plt.savefig(filename)

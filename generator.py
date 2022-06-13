@@ -109,11 +109,11 @@ class Generator:
 
         # TODO do we need channel selector?
 
-        subj_list_with_ch = []
+        """subj_list_with_ch = []
         for raw_std in raw_standardized:
             subj_list_with_ch.append(raw_std.pick_channels(["FC1", "FC2"]))
         # now we need to split up the data into numpy epochs
-        # from t=0 to t=4
+        # from t=0 to t=4"""
 
         # TODO baseline needed?
 
@@ -126,7 +126,7 @@ class Generator:
         tmax: int = 4
         event_id = dict(rest=1, both_feet=2, left=3, both_fist=4, right=5)
         event_dict = []
-        for r in subj_list_with_ch:
+        for r in raw_standardized:
             events, event_dict = mne.events_from_annotations(r)
             # print(event_dict)
             # events, _ = mne.events_from_annotations(r)
@@ -146,17 +146,14 @@ class Generator:
         #       appends the item
         return np.concatenate(tuple(xs), axis=0), [item for sublist in ys for item in sublist]
 
-    # TODO redundant lines
     @staticmethod
     def generate():
         exclude = [38, 88, 89, 92, 100, 104]
-        # smartypants list comprehension for making a list with exclusion
         subjects = [n for n in np.arange(1, 50) if n not in exclude]
-        # subjects = [1]
         runs = [4, 6, 8, 10, 12, 14]
-        data_path = os.getcwd()
-        save_path = os.path.join(os.getcwd(), "test_generate2/first_gen")
-        # os.makedirs(save_path)
+        data_path = os.path.join(os.getcwd(), "raw_data")
+        save_path = os.path.join(os.getcwd(), "legacy_generator/all_electrodes_50_patients")
+        #os.makedirs(save_path)
         for sub in subjects:
             x, y = Generator.load_data(subjects, runs, data_path)
 
