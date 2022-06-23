@@ -10,7 +10,7 @@ class Generator:
     # because i just want to use them current as a self-contained functions
     # TODO redundant lines around enumerations
     @staticmethod
-    def load_data(subjects: list, runs: list, data_path: str) -> (np.ndarray, list):
+    def load_data(subject: int, data_path: str) -> (np.ndarray, list, list):
         # this introduces typing module for typing hints, type assignments. Check mypy for more info and analysis.
         # for more info check https://docs.python.org/3/library/typing.html and http://mypy-lang.org (its epic)
         # The BasedRaw format: https://mne.tools/stable/generated/mne.io.BaseRaw.html?highlight=baseraw#mne.io.BaseRaw
@@ -18,133 +18,125 @@ class Generator:
         # Source from https://github.com/Kubasinska/MI-EEG-1D-CNN processor
         # Take in subject list, runs list, data path as string, and returns a list consisting of lists of BaseRaw
         # Iterates through each folder, and each run loads them and modifies the labels, then returns a list
+        """
+        Takes a single subject and preprocesses it for the generator function
+        The data path is given a simple string
+        The function returns:
+            xs: Time series ndarray of the data with a shape of(n_sample, 64, 641)
+            y: The list of labels with a length of n_samples
+            ch_names: The 64 channels in the xs array as str list
+        """
 
-        # In the end it returns the final epochs and a list
-        # TODO Replace the if statements with something, possibly with one of the functions written
-        all_subject_list = []
-        subjects = [str(s) for s in subjects]
-        runs = [str(r) for r in runs]
-        # selecting imaginary tasks, we only need these to train the network
+        # The imaginary runs for indexing purposes
+        runs = [4, 6, 8, 10, 12, 14]
         task2 = [4, 8, 12]  # fists
-        task4 = [6, 10, 14]  # legs
-        # iterating through the subjects list(a simple str list)
-        for sub in subjects:
-            # naming scheme for the folders
-            if len(sub) == 1:
-                sub_name = "S00" + sub
-            elif len(sub) == 2:
-                sub_name = "S0" + sub
-            else:
-                sub_name = "S" + sub
-            sub_folder = os.path.join(data_path, sub_name)
-            single_subject_run = []
-            for run in runs:
-                if len(run) == 1:
-                    path_run = os.path.join(sub_folder, sub_name + "R0" + run + ".edf")
-                else:
-                    path_run = os.path.join(sub_folder, sub_name + "R" + run + ".edf")
-                raw_run = mne.io.read_raw_edf(path_run, preload=True)
-                len_run = np.sum(raw_run._annotations.duration)
-                if len_run > 124:
-                    print(sub)
-                    raw_run.crop(tmax=124)
+        task4 = [6, 10, 14] # legs
 
-                """
-                rest(baseline)
-                left: motor imagination of opening and closing left fist;
-                right:motor imagination of opening and closing right fist;
-                both_fist: indicates motor imagination of opening and closing both fists;
-                both_feet: indicates motor imagination of opening and closing both feet.
-                """
-                # TODO replace this with normal looking list/dict styled structure
-                if int(run) in task2:
-                    for index, an in enumerate(raw_run.annotations.description):
-                        if an == "T0":
-                            raw_run.annotations.description[index] = "re"   # Rest
-                        if an == "T1":
-                            raw_run.annotations.description[index] = "le"   # Left
-                        if an == "T2":
-                            raw_run.annotations.description[index] = "ri"   # Right
-                if int(run) in task4:
-                    for index, an in enumerate(raw_run.annotations.description):
-                        if an == "T0":
-                            raw_run.annotations.description[index] = "re"   # Rest
-                        if an == "T1":
-                            raw_run.annotations.description[index] = "fi"   # Fists
-                        if an == "T2":
-                            raw_run.annotations.description[index] = "fe"   # Feet
-                single_subject_run.append(raw_run)
-            all_subject_list.append(single_subject_run)
-        # returns with type list[list[mne.io.BaseRaw]], i commented it out beacuse we need to concatenate and del annot
-        ### return all_subject_list
+        # The subject naming scheme can be adapted using zero fill(z-fill)
+        sub_name = 'S' + str(subject).zfill(3)
 
-        # concatenating runs
-        raw_conc_list = []
-        for subj in all_subject_list:
-            raw_conc = mne.io.concatenate_raws(subj)
-            raw_conc_list.append(raw_conc)
-        # return type: List[BaseRaw],  still processing afterwards
-        ### return raw_conc_list
+        # Generates a path for the folder of the subject
+        sub_folder = os.path.join(data_path, sub_name)
+        subject_runs = []
 
-        # deleting edge and bad boundary annotations from raws
-        raw_bound_cleaned_list = []
-        for subj in raw_conc_list:
-            indexes = []
-            for index, value in enumerate(subj.annotations.description):
-                if value == "BAD boundary" or value == "EDGE boundary":
-                    indexes.append(index)
-            subj.annotations.delete(indexes)
-            # cleaned list
-            raw_bound_cleaned_list.append(subj)
+        # Processing each run individually for each subject
+        for run in runs:
+            # Here I also use zero-fill, generates the path using the folder path, with specifying the run
+            path_run = os.path.join(sub_folder, sub_name + 'R' + str(run).zfill(2) + '.edf')
 
-        # return type: List[BaseRaw], still processing
-        ### return raw_bound_cleaned_list
+            # Finally reading the raw edf file
+            raw_filt = mne.io.read_raw_edf(path_run, preload=True)
+            # Checking the file for a single run
+            # raw_run.plot_psd(fmax=80);
 
-        raw_standardized = []
-        for subj in raw_bound_cleaned_list:
-            mne.datasets.eegbci.standardize(subj)
-            montage = mne.channels.make_standard_montage('standard_1005')
-            subj.set_montage(montage)
-            raw_standardized.append(subj)
+            raw_filt = raw_filt.copy().filter(0.1, 30)
+            # raw_filt.plot_psd(fmax=80);
 
-        # TODO do we need channel selector?
+            # This trims the run to 124 sec precisely because by default its set to 125 secs
+            # 125 seconds * 160 Hz = 2000 data points
 
-        """subj_list_with_ch = []
-        for raw_std in raw_standardized:
-            subj_list_with_ch.append(raw_std.pick_channels(["FC1", "FC2"]))
-        # now we need to split up the data into numpy epochs
-        # from t=0 to t=4"""
+            if np.sum(raw_filt.annotations.duration) > 124:
+                raw_filt.crop(tmax=124)
 
-        # TODO baseline needed?
+            # The result is a somewhat smaller run in terms of length, currently im not sure why this is needed
+            # Now we need to make epochs based on the annotations
+            """
+            B indicates baseline
+            L indicates motor imagination of opening and closing left fist;
+            R indicates motor imagination of opening and closing right fist;
+            LR indicates motor imagination of opening and closing both fists;
+            F indicates motor imagination of opening and closing both feet.
+            I want to figure out why the indexes are only accepting two chars
+            Looks like the annotation description of the raw runs have <u2(2 char unicode) dtype: {dtype[str_]:()} <U2
+            """
 
-        # epoch creator
-        # TODO investigate better x and y
+            """
+            The description for each run describes the sequence of
+                T0: rest
+                T1: motion real/imaginary
+                    the left fist (in runs 3, 4, 7, 8, 11, and 12)
+                    both fists (in runs 5, 6, 9, 10, 13, and 14)
+                T2: motion real/imaginary
+                    the right fist (in runs 3, 4, 7, 8, 11, and 12)
+                    both feet (in runs 5, 6, 9, 10, 13, and 14)
+            So if we print out the annotation descriptions we would get T0 between all of the T1 and T2 annotations.
+            It is easily recognisable that the meaning of 'T0-1-2' descriptions are dependent on the run numbers.
+            """
+            print("Events from annotations: ", mne.events_from_annotations(raw_filt))
+            print('Raw annotation original descriptions: \n', raw_filt.annotations.description)
+            if run in task2:
+                for index, annotation in enumerate(raw_filt.annotations.description):
+                    if annotation == "T0":
+                        raw_filt.annotations.description[index] = 'B'
+                    if annotation == "T1":
+                        raw_filt.annotations.description[index] = "L"
+                    if annotation == "T2":
+                        raw_filt.annotations.description[index] = "R"
+            if run in task4:
+                for index, annotation in enumerate(raw_filt.annotations.description):
+                    if annotation == "T0":
+                        raw_filt.annotations.description[index] = "B"
+                    if annotation == "T1":
+                        raw_filt.annotations.description[index] = "LR"
+                    if annotation == "T2":
+                        raw_filt.annotations.description[index] = "F"
+            print('Raw annotation modified descriptions: \n', raw_filt.annotations.description)
+            subject_runs.append(raw_filt)
+        # After re-classifying each run into their own category the annotations are proprely labeled
+        # print(subject_runs[0].annotations.description)
+        raw_conc = mne.io.concatenate_raws(subject_runs, preload=True)
 
-        xs = list()
-        ys = list()
-        tmin: int = 0
-        tmax: int = 4
-        event_id = dict(rest=1, both_feet=2, left=3, both_fist=4, right=5)
-        event_dict = []
-        for r in raw_standardized:
-            events, event_dict = mne.events_from_annotations(r)
-            # print(event_dict)
-            # events, _ = mne.events_from_annotations(r)
-            picks = mne.pick_types(r.info, meg=False, eeg=True, stim=False, eog=False, exclude='bads')
-            epochs = mne.epochs.Epochs(r, events, event_dict, tmin, tmax, proj=True, picks=picks, baseline=None,
-                                       preload=True)
+        # First i assign a dummy event_id variable where I dump all the relevant data about our epoch, then rename them
+        events, event_id = mne.events_from_annotations(raw_conc)
+
+        # Renaming the events using a standard dictionary
+        # event_id = dict(rest=1, both_feet=2, left=3, left_right_hands=4, right=5)
+
+        event_id = {
+            'rest': 1,
+            'both_feet': 2,
+            'left_hand': 3,
+            'both_hands': 4,
+            'right_hand': 5
+        }
+        # Excluding bad channels
+        picks = mne.pick_types(raw_conc.info, meg=False, eeg=True, stim=False, eog=False, exclude='bads')
+        # Generating epochs, SSP is enabled, as an option here we could reject bad boundaries if needed
+        epochs = mne.epochs.Epochs(raw_conc, events, event_id, tmin=0, tmax=4, proj=True, picks=picks, baseline=None,
+                                   preload=True)
+
+        print('EEG channels: \n', epochs[0].ch_names)
 
         y = list()
         for index, data in enumerate(epochs):
             y.append(epochs[index]._name)
 
-        xs.append(np.array([epoch for epoch in epochs]))
-        ys.append(y)
-        # returns a concatenated xs, and a ys which is a pretty rough list comprehension
-        # for sublist in ys:
-        #    for item in sublist:
-        #       appends the item
-        return np.concatenate(tuple(xs), axis=0), [item for sublist in ys for item in sublist]
+
+        # channel_names=raw_conc.ch_names
+        # This list comprehension does the same as casting into an np-array
+        # xs = np.array([epoch for epoch in epochs])
+        xs = np.array(epochs)
+        return xs[:160,:,:], y[:160]
 
     @staticmethod
     def generate():
@@ -155,7 +147,7 @@ class Generator:
         save_path = os.path.join(os.getcwd(), "legacy_generator/all_electrodes_50_patients")
         #os.makedirs(save_path)
         for sub in subjects:
-            x, y = Generator.load_data(subjects, runs, data_path)
+            x, y = Generator.load_data(50, data_path)
 
             np.save(os.path.join(save_path, "x_sub_" + str(sub)), x, allow_pickle=True)
             np.save(os.path.join(save_path, "y_sub_" + str(sub)), y, allow_pickle=True)

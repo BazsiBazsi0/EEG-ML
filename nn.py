@@ -38,6 +38,9 @@ class NeuralNets:
 
     @staticmethod
     def starter_net():
+        loss = tf.keras.losses.categorical_crossentropy
+        optimizer = tf.keras.optimizers.Adam()
+
         kernel_size_0 = 20
         kernel_size_1 = 6
         drop_rate = 0.5
@@ -64,7 +67,9 @@ class NeuralNets:
         dropout3 = tf.keras.layers.Dropout(drop_rate)(dense3)
         out = tf.keras.layers.Dense(5, activation='softmax')(dropout3)
 
-        return tf.keras.Model(inputs, out)
+        model = tf.keras.Model(inputs, out)
+        model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
+        return model
 
     @staticmethod
     def bad_net():
@@ -101,8 +106,8 @@ class NeuralNets:
         y_predict = model.predict(x_test)
 
         # convert from one hot encode in string
-        y_test_class = np.argmax(y_test, axis=1)
-        y_predicted_classes = np.argmax(y_predict, axis=1)
+        y_test_class = tf.argmax(y_test, axis=1)
+        y_predicted_classes = tf.argmax(y_predict, axis=1)
 
         print('Classification report: ')
         print(classification_report(y_test_class, y_predicted_classes))

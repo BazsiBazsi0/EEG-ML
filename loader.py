@@ -7,7 +7,7 @@ class FileLoader:
     def load_saved_files():
         # load the saved files
         exclude = [38, 88, 89, 92, 100, 104]
-        subjects = [n for n in np.arange(1, 20) if n not in exclude]
+        subjects = [n for n in range(1, 11) if n not in exclude]
         xs = list()
         ys = list()
         data_x = list()
