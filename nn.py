@@ -1,40 +1,10 @@
 import numpy as np
 import tensorflow as tf
-from imblearn.over_sampling import SMOTE
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 
 
 class NeuralNets:
-
-    # if I want to switch this to another method here are the possibilities:
-    # use sklearn onehot, this could cause problems down the line, need to investigate
-    # use tf.one_hot but this doesn't preserve the labels, since it's a integer/tensor operation
-    # use this with minor improvements as this already uses the .to_categorical method
-    @staticmethod
-    def to_one_hot(y):
-        # shallow copy to a new array
-        y_shallow_copy = y.copy()
-        # New unique labels in case of double vals(maybe there are duplicates)
-        total_labels = np.unique(y_shallow_copy)
-
-        # Dictionary named encoding for labels
-        encoding = {}
-        for x in range(len(total_labels)):
-            encoding[total_labels[x]] = x
-        for x in range(len(y_shallow_copy)):
-            y_shallow_copy[x] = encoding[y_shallow_copy[x]]
-
-        return tf.keras.utils.to_categorical(y_shallow_copy)
-
-    # Synthetic Minority Oversampling Technique
-    # This balances the imbalance between 'rest' (re) and the other classes
-    # TODO more reading: https://imbalanced-learn.org/stable/over_sampling.html
-    @staticmethod
-    def smote_processor(x, y):
-        sm = SMOTE(random_state=42)
-        x_resampled, y_resampled = sm.fit_resample(x, y)
-        return x_resampled, y_resampled
 
     @staticmethod
     def starter_net():
@@ -45,7 +15,7 @@ class NeuralNets:
         kernel_size_1 = 6
         drop_rate = 0.5
 
-        inputs = tf.keras.Input(shape=(641, 64))
+        inputs = tf.keras.Input(shape=(64, 641))
         conv1 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="same")(inputs)
         batch_n_1 = tf.keras.layers.BatchNormalization()(conv1)
         conv2 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="valid")(
@@ -72,12 +42,15 @@ class NeuralNets:
         return model
 
     @staticmethod
-    def bad_net():
+    def basic_net():
+        loss = tf.keras.losses.categorical_crossentropy
+        optimizer = tf.keras.optimizers.Adam()
+
         kernel_size_0 = 20
         kernel_size_1 = 6
         drop_rate = 0.5
 
-        inputs = tf.keras.Input(shape=(641, 2))
+        inputs = tf.keras.Input(shape=(64, 641))
         conv1 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="same")(inputs)
         batch_n_1 = tf.keras.layers.BatchNormalization()(conv1)
         conv2 = tf.keras.layers.Conv1D(filters=32, kernel_size=kernel_size_0, activation='relu', padding="valid")(
@@ -99,7 +72,9 @@ class NeuralNets:
         # dropout3 = tf.keras.layers.Dropout(drop_rate)(dense3)
         out = tf.keras.layers.Dense(5, activation='softmax')(dense3)
 
-        return tf.keras.Model(inputs, out)
+        model = tf.keras.Model(inputs, out)
+        model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
+        return model
 
     @staticmethod
     def metrics_generation(model, x_test, y_test):

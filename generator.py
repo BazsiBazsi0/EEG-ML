@@ -136,6 +136,7 @@ class Generator:
         # This list comprehension does the same as casting into an np-array
         # xs = np.array([epoch for epoch in epochs])
         xs = np.array(epochs)
+        xs = xs[:160,:,:]
         return xs[:160,:,:], y[:160]
 
     @staticmethod

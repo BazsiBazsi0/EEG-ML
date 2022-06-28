@@ -1,70 +1,51 @@
 import numpy as np
-import tensorflow as tf
-from sklearn.preprocessing import minmax_scale
-from sklearn.model_selection import train_test_split, LeaveOneOut, KFold
+import os
 import loader, nn, generator
 
 #generator.Generator.generate()
 
-x, y = loader.FileLoader.load_saved_files()
+# Required data: how many patients t load
+patients_to_load = 10
+test_size = 0.1
+x, y, x_no_smote, y_no_smote = loader.FileLoader.load_saved_files(patients=patients_to_load)
 print('Shape of x: ', np.shape(x))
 
-# Transform y to one-hot-encoding
-y_one_hot = nn.NeuralNets.to_one_hot(y)
-# Reshape for scaling
-x_reshaped = x.reshape(x.shape[0], x.shape[1] * x.shape[2])
-# TODO train on 9 person, test on 1 person, make generation to only generate 160 epoch per person ###DONE
-#   leave one person(160 epochs) out per iteration, every iteration different person is the test set ###DONE
-#   Shuffle before slicing the arrays ###DONE implemented train_test_split with shuffle
-
-x_train_raw, x_test_raw, y_train_raw, y_test_raw = train_test_split(x_reshaped, y_one_hot, test_size=0.1, shuffle = True)
-
-# Scale between 0 and 1
-x_train_scaled = minmax_scale(x_train_raw, axis=1)
-x_test_scaled = minmax_scale(x_test_raw, axis=1)
-
-# SMOTE
-x_train_smote, y_train = nn.NeuralNets.smote_processor(x_train_scaled, y_train_raw)
-print('classes count')
-print('before oversampling = {}'.format(y_train_raw.sum(axis=0)))
-print('after oversampling = {}'.format(y_train.sum(axis=0)))
-
-# Transforms back into the original shape
-x_train = x_train_smote.reshape(x_train_smote.shape[0], int(x_train_smote.shape[1] / 64), 64)
-x_test = x_test_scaled.reshape(x_test_scaled.shape[0], int(x_test_scaled.shape[1] / 64), 64)
-x_train_nosmote = x_train_scaled.reshape(x_train_scaled.shape[0], int(x_train_scaled.shape[1] / 64), 64)
-
-loss = tf.keras.losses.categorical_crossentropy
-optimizer = tf.keras.optimizers.Adam()
-
-"""models = {'SMOTE': nn.NeuralNets.starter_net(),
-          'NO_SMOTE': nn.NeuralNets.starter_net(),
-          'leave_one_out': nn.NeuralNets.starter_net()}"""
+# SMOTE comparison, sums up per patients, then sums up everything
+print('Instances of classes before SMOTE: ', y_no_smote.sum(axis=1).sum(axis=0))
+print('Instances of classes after SMOTE: ', y.sum(axis=1).sum(axis=0))
 
 history_loo = []
 acc = []
 avgAcc = []
-for i in range(0, 3360, 160):
-    print('Current loop index: ', i//160)
-    loo_left_out_x = x_train[i:i+160]
-    loo_left_out_y = y_train_raw[i:i+160]
-    loo_left_in_x = np.append(x_train[:i], x_train[i+160:], 0)
-    loo_left_in_y = np.append(y_train[:i], y_train[i+160:], 0)
+for i in range(0, patients_to_load):
+    print('Current loop index: ', i)
+    # Leaving out one person from the training
+    x_loop = np.append(x_no_smote[:i], x_no_smote[i+1:], 0)
+    # Reshaping into 2D array
+    x_2d = x_loop.reshape((int(x_loop.shape[0] * x_loop.shape[1]), x_loop.shape[2], x_loop.shape[3]))
 
-    model = nn.NeuralNets.starter_net()
-    history = model.fit(loo_left_in_x, loo_left_in_y,
-                        epochs=5, batch_size=100,
-                        validation_data=(loo_left_out_x, loo_left_out_y))
+    y_loop = np.append(y_no_smote[:i], y_no_smote[i+1:], 0)
+    y_2d = y_loop.reshape((int(y_loop.shape[0] * y_loop.shape[1]), y_loop.shape[2]))
+
+    x_val = x_no_smote[i]
+    y_val = y_no_smote[i]
+
+    model = nn.NeuralNets.basic_net()
+
+    # Validation is done on person left out on from the training from the train set
+    history = model.fit(x_2d, y_2d, epochs=10, batch_size=100, validation_data=(x_val, y_val))
     history_loo.append(history)
-    testLoss, testAcc = model.evaluate(loo_left_out_x, loo_left_out_y)
-    # del model
+
+    # Saving and averaging the accuracies, evaluation is done on the original dataset
+    testLoss, testAcc = model.evaluate(x_val, y_val)
     acc.append(testAcc)
     avgAcc = np.average(acc)
     print('Current avg acc:', avgAcc)
 
+#np.save(os.path.join(os.getcwd(), "accuracy"), acc, allow_pickle=True)
+np.savetxt("accuracy_no_smote.csv", acc, delimiter=",", fmt = '%.4f')
 print('Final avg acc:', avgAcc)
-# Final avg acc: 1.0 , LOO cv-d on 10 patients, 50 epochs, batch_size=25 acc across 10 loops
-
+# Trained on SMOTE:
 """
 history_smote = models['SMOTE'].fit(x_train, y_train, epochs=10, batch_size=100, validation_data=(x_test, y_test_raw))
 history_no_smote = models['NO_SMOTE'].fit(x_train, y_train, epochs=10, batch_size=100, validation_data=(x_test, y_test_raw))
