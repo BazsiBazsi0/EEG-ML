@@ -3,8 +3,48 @@ import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 
-
 class NeuralNets:
+
+    @staticmethod
+    def leave_one_out(x, y):
+        models = {'StarterNet': NeuralNets.starter_net(),
+                  'BasicNet': NeuralNets.basic_net()}
+        history_loo = []
+        acc_loop = []
+        acc = []
+        avg_acc = []
+        for model_name, model in models.items():
+            for i in range(0, len(x)):
+                print('Current loop index: ', i)
+                # Leaving out one person from the training
+                x_loop = np.append(x[:i], x[i + 1:], 0)
+                # Reshaping into 2D array
+                x_2d = x_loop.reshape((int(x_loop.shape[0] * x_loop.shape[1]), x_loop.shape[2], x_loop.shape[3]))
+
+                y_loop = np.append(y[:i], y[i + 1:], 0)
+                y_2d = y_loop.reshape((int(y_loop.shape[0] * y_loop.shape[1]), y_loop.shape[2]))
+
+                # Validation data: the left out person from train data
+                x_val = x[i]
+                y_val = y[i]
+
+                # Creating and saving the models
+
+                # Validation is done on person left out on from the training from the train set
+                history = model.fit(x_2d, y_2d, epochs=10, batch_size=100, validation_data=(x_val, y_val))
+                history_loo.append(history)
+
+                # Saving and averaging the accuracies, evaluation is done on the original dataset
+                test_loss, test_acc = models[model_name].evaluate(x_val, y_val)
+
+                acc_loop.append(test_acc)
+                avg_acc_loop = [np.average(acc_loop)]
+
+            acc.append(acc_loop)
+            avg_acc.append(avg_acc_loop)
+            acc_loop = []
+
+        return models, history_loo, acc, avg_acc
 
     @staticmethod
     def starter_net():
@@ -91,6 +131,13 @@ class NeuralNets:
         print('Confusion matrix: ')
 
         print(confusion_matrix(y_test_class, y_predicted_classes))
+
+    @staticmethod
+    def metrics_csv(file_name, acc, average_accuracy):
+        np.savetxt(file_name, np.column_stack([acc[0], acc[1]]), delimiter=",", fmt='%.4f',
+                   header='no_smote,smote', comments='')
+        with open(file_name, 'a') as file:
+            file.write('\n' + str(np.round(average_accuracy[0], 4)) + ',' + str(np.round(average_accuracy[1], 4)))
 
     @staticmethod
     def save_accuracy_curves(history, number_of_epochs, filename):
