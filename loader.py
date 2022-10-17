@@ -58,12 +58,46 @@ class FileLoader:
         return x, y_smote, x_no_smote, y_no_smote
 
     @staticmethod
+    def data_equalizer(x, y):
+        # The purpose of this function is to slim down x or y, so they have equal sample sizes
+        # This is destructive data processing technique
+        # I saw somewhere during loading that the slice down the rest(baseline) might worth investigating
+
+        # Finding the minium occurrence tests, this is the data we need equalize all the other test sample numbers
+        # This is not the number of all tests permitted, but the total number of test within a class for each person
+        min_test = y.sum(axis=1).sum(axis=0).min() / len(x)  # only needed when per persons basis the picking
+
+        # The lowest class occurrence is the first one. 17 occurrence in every patient. 17 * 5(there are 5 classes) = 85
+        # Since we have to traverse the original array and levea out all classes that have higher occurance than 17,
+        # we are going to create an array that is the same size of the original and later delete the zero values
+        # Later I'm are going to create it dynamically based on the shape of the incoming array
+
+        # Update: it seems like the np.empty or np.zeros is good enough so it might not need deletion after creation
+        new_x = np.empty((10, 35, 64, 641))
+        new_y = np.empty((10, 35, 5))
+        classes_count = np.zeros((10, 5))
+        for i in range(len(new_y)):
+            for t in range(len(new_y[i])):
+                for z in range(len(new_y[i][t])):
+                    if y[i][t][z] == 1 and classes_count[i][z] < 7:
+                        new_x[i][t] = x[i][t]
+                        new_y[i][t] = y[i][t]
+                        classes_count[i][z] += 1
+
+        return new_x, new_y
+
+    @staticmethod
     def load_saved_files(patients):
+        # The output for this function is patients x epochs x channels x datapoints
+        # for x_no smote with 1 patient its 1 x 160 x 64 x 641 ( one patient with 160 epoch, 64 chs, and 641 datapoints)
+        # for y_no_smote with 1 patient its 1 x 160 x 5 (1 patient with 160 epoch and 5 classes in each epoch)
+
         # load the saved files
         exclude = [38, 88, 89, 92, 100, 104]
-        subjects = [n for n in range(1, patients+1) if n not in exclude]
+        subjects = [n for n in range(1, patients + 1) if n not in exclude]
         xs = []
         ys = []
+        # [], is a touple and not a valid container for data lol
         data_x = []
         data_y = []
         for s in subjects:
@@ -83,10 +117,11 @@ class FileLoader:
         # Structure:
         #   x = Patients x Epochs x Channels X Datapoints
         #   y = Patients x Epochs x One-hot Labels
-        x = x_pre.reshape(patients, x_pre.shape[0]//patients, x_pre.shape[1], x_pre.shape[2])
-        y = y_pre.reshape(patients, y_pre.shape[0]//patients, y_pre.shape[1])
+        x = x_pre.reshape(patients, x_pre.shape[0] // patients, x_pre.shape[1], x_pre.shape[2])
+        y = y_pre.reshape(patients, y_pre.shape[0] // patients, y_pre.shape[1])
 
-        x_no_smote = x_no_smote_pre.reshape(patients, x_no_smote_pre.shape[0]//patients, x_no_smote_pre.shape[1], x_no_smote_pre.shape[2])
-        y_no_smote = y_no_smote_pre.reshape(patients, y_no_smote_pre.shape[0]//patients, y_no_smote_pre.shape[1])
+        x_no_smote = x_no_smote_pre.reshape(patients, x_no_smote_pre.shape[0] // patients, x_no_smote_pre.shape[1],
+                                            x_no_smote_pre.shape[2])
+        y_no_smote = y_no_smote_pre.reshape(patients, y_no_smote_pre.shape[0] // patients, y_no_smote_pre.shape[1])
 
         return x, y, x_no_smote, y_no_smote

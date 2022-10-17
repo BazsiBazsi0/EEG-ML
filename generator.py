@@ -131,6 +131,9 @@ class Generator:
         for index, data in enumerate(epochs):
             y.append(epochs[index]._name)
 
+        # TODO: Külön szedve az adatokat """epochs.get_data..."""
+        #   epochs lekérés egyben
+        # TODO check out epochs.equalize_event_counts()
 
         # channel_names=raw_conc.ch_names
         # This list comprehension does the same as casting into an np-array

@@ -3,19 +3,21 @@ import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 
+
 class NeuralNets:
 
     @staticmethod
     def leave_one_out(x, y):
         models = {'StarterNet': NeuralNets.starter_net(),
-                  'BasicNet': NeuralNets.basic_net()}
+                  'BasicNet': NeuralNets.no_dropout_starter()
+                  }
         history_loo = []
         acc_loop = []
         acc = []
         avg_acc = []
         for model_name, model in models.items():
             for i in range(0, len(x)):
-                print('Current loop index: ', i)
+                print('Current model: ', model_name, 'Current loop index: ', i, ' / ', len(x))
                 # Leaving out one person from the training
                 x_loop = np.append(x[:i], x[i + 1:], 0)
                 # Reshaping into 2D array
@@ -30,8 +32,8 @@ class NeuralNets:
 
                 # Creating and saving the models
 
-                # Validation is done on person left out on from the training from the train set
-                history = model.fit(x_2d, y_2d, epochs=10, batch_size=100, validation_data=(x_val, y_val))
+                # Validation is done on person left out on from the training from the train set, silenced the output
+                history = model.fit(x_2d, y_2d, epochs=10, batch_size=100, validation_data=(x_val, y_val), verbose=0)
                 history_loo.append(history)
 
                 # Saving and averaging the accuracies, evaluation is done on the original dataset
@@ -82,7 +84,7 @@ class NeuralNets:
         return model
 
     @staticmethod
-    def basic_net():
+    def no_dropout_starter():
         loss = tf.keras.losses.categorical_crossentropy
         optimizer = tf.keras.optimizers.Adam()
 
@@ -120,7 +122,7 @@ class NeuralNets:
     def metrics_generation(model, x_test, y_test):
         y_predict = model.predict(x_test)
 
-        # convert from one hot encode in string
+        # convert from a one hot encode in string
         y_test_class = tf.argmax(y_test, axis=1)
         y_predicted_classes = tf.argmax(y_predict, axis=1)
 
@@ -135,7 +137,7 @@ class NeuralNets:
     @staticmethod
     def metrics_csv(file_name, acc, average_accuracy):
         np.savetxt(file_name, np.column_stack([acc[0], acc[1]]), delimiter=",", fmt='%.4f',
-                   header='no_smote,smote', comments='')
+                   header='starter,no_dropout_starter', comments='')
         with open(file_name, 'a') as file:
             file.write('\n' + str(np.round(average_accuracy[0], 4)) + ',' + str(np.round(average_accuracy[1], 4)))
 
