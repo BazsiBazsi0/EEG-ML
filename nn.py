@@ -211,25 +211,37 @@ class NeuralNets:
         x_train_shape = x_train.shape
         # Apply Fast Fourier Transform to the training data
         x_train_fft = np.fft.fft(x_train)
-        x_train_fft = np.abs(x_train_fft)
 
-        # Reshape the data to be suitable for SMOTE
-        x_2d = x_train_fft.reshape((-1, x_train_fft.shape[2] * x_train_fft.shape[3]))
         y_2d = y_train.reshape((-1, y_train.shape[2]))
+
+        magnitude = np.abs(x_train_fft)
+        phase = np.angle(x_train_fft)
+        magnitude_2D = magnitude.reshape(-1, magnitude.shape[2] * magnitude.shape[3])
+        phase_2D = phase.reshape(-1, phase.shape[2] * phase.shape[3])
+
+        # Apply SMOTE to the magnitude and phase of the FFT
+        # Reshape the data to be suitable for SMOTE
+        # x_2d = x_train_fft.reshape((-1, x_train_fft.shape[2] * x_train_fft.shape[3]))
+        # y_2d = y_train.reshape((-1, y_train.shape[2]))
 
         # Use SMOTE to oversample the minority class
         sm = SMOTE(random_state=42)
-        x_train_fft, y_train_fft = sm.fit_resample(x_2d, y_2d)
+        magnitude_2D, y = sm.fit_resample(magnitude_2D, y_2d)
+        phase_2D, y = sm.fit_resample(phase_2D, y_2d)
 
-        # Apply the inverse Fast Fourier Transform to the processed data
-        x_train_fft = np.fft.ifft(x_train_fft)
-        x_train_fft = np.abs(x_train_fft)
+        mag = magnitude_2D.ravel()
+        phas = phase_2D.ravel()
+        x = []
+        for i in range(len(mag)):
+            x.append(mag[i] * np.exp(1j * phas[i]))
 
-        x_train_fft = x_train_fft.reshape(10, -1 , x_train.shape[2], 641)
-        y_train_fft = y_train_fft.reshape(10, -1, 5)
+        x = np.fft.ifft(x)
+        magnitude = magnitude_2D.reshape(10, -1 , x_train.shape[2], 641)
+        phase = phase_2D.reshape(10, -1 , x_train.shape[2], 641)
+        y = y.reshape(10, -1, 5)
 
         # Return the processed data
-        return x_train_fft, y_train_fft
+        return x, y
 
     @staticmethod
     def metrics_generation(models, x_test, y_test, file_name):

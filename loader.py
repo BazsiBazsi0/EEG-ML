@@ -130,7 +130,7 @@ class FileLoader:
         y_no_smote = y_no_smote_pre.reshape(patients,  y_no_smote_pre.shape[0] // patients, y_no_smote_pre.shape[1]).astype(np.float32)
 
         x_fft, y_fft = nn.NeuralNets.fft_processor(x_no_smote, y_no_smote)
-        return x_fft, y_fft
+        return x_fft, y_fft #x_no_smote, y_no_smote
 
     @staticmethod
     def load_saved_files_val():
