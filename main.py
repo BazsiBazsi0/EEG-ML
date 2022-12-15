@@ -2,31 +2,42 @@ import numpy as np
 import os
 import loader, nn, generator
 
+# TODO make runs with non-smote + balanced data (reduce rest) + keep test balanced
+# TODO try to compare the data with oversampling the non-rest, try the same for test
+
+# Only use the first available gpu/device
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
+
 #generator.Generator.generate()
 
-# Required data: how many patients t load
-patients_to_load = 10
-x, y, x_no_smote, y_no_smote = loader.FileLoader.load_saved_files(patients=patients_to_load)
-x_no_rest, y_no_rest = loader.FileLoader.data_equalizer(x_no_smote, y_no_smote)
+x, y = loader.FileLoader.load_saved_files()
+#x_fft, y_fft = nn.NeuralNets.fft_processor(x_no_smote, y_no_smote)
+# x_no_rest, y_no_rest = loader.FileLoader.data_equalizer(x_no_smote, y_no_smote)
 print('Shape of x: ', np.shape(x))
 
-# TODO make runs with non-smote + balanced data (reduce rest) + keep test balanced
-    #   The rest remove is done
-    #   Next is modifying it or writing a fucntion that also measures the other instances
-# TODO try to compare the data with oversampling the non-rest, try the same for test
-# TODO Confusion matrix generation
-# TODO szakdoga sablon methods: somte stb, jövőhétre vázlat, desktop beállítás
-# SMOTE comparison, sums up per patients, then sums up everything
-
-print('Instances of classes no SMOTE: ', y_no_smote.sum(axis=1).sum(axis=0))
-print('Instances of classes data eq: ', y_no_rest.sum(axis=1).sum(axis=0))
+#print('Instances of classes no SMOTE: ', y_no_smote.sum(axis=1).sum(axis=0))
+# print('Instances of classes data eq: ', y_no_rest.sum(axis=1).sum(axis=0))
 print('Instances of classes after SMOTE: ', y.sum(axis=1).sum(axis=0))
 
-models, history_loo, acc, avgAcc = nn.NeuralNets.leave_one_out(x_no_smote, y_no_smote)
+history, model, acc, avgAcc = nn.NeuralNets.loo(x,y)
+
+#model = nn.NeuralNets.one_d_cnn_multi()
+#nn.NeuralNets.generator_processor(model, x_no_smote, y_no_smote)
+#models, history_loo, acc, avgAcc = nn.NeuralNets.leave_one_out(x_no_smote, y_no_smote)
+
+with open('avg accuracy.txt', 'a') as f:
+    f.write(str(avgAcc) + '\n')
 
 print('Final avg accuracy:', avgAcc)
 
-nn.NeuralNets.metrics_csv('accuracy.csv', acc, avgAcc)
+x, y, x_no_smote, y_no_smote = loader.FileLoader.load_saved_files_val()
+nn.NeuralNets.metrics_generation(model, x_no_smote, y_no_smote, "1DCNN")
+nn.NeuralNets.plot_roc_curve(model, x_no_smote, y_no_smote, "1DCNN")
+
+
+
+"""nn.NeuralNets.metrics_generation(models['FCN'], x_no_smote, y_no_smote)
+nn.NeuralNets.plot_roc_curve(models['FCN'], x_no_smote, y_no_smote, "FCN.png")"""
 
 
 

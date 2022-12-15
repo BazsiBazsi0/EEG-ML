@@ -1,0 +1,60 @@
+For model 0:
+AUC for class 0 is 0
+AUC for class 0 is 1
+AUC for class 0 is 2
+AUC for class 0 is 3
+AUC for class 0 is 4
+For model 1:
+AUC for class 1 is 0
+AUC for class 1 is 1
+AUC for class 1 is 2
+AUC for class 1 is 3
+AUC for class 1 is 4
+For model 2:
+AUC for class 2 is 0
+AUC for class 2 is 1
+AUC for class 2 is 2
+AUC for class 2 is 3
+AUC for class 2 is 4
+For model 3:
+AUC for class 3 is 0
+AUC for class 3 is 1
+AUC for class 3 is 2
+AUC for class 3 is 3
+AUC for class 3 is 4
+For model 4:
+AUC for class 4 is 0
+AUC for class 4 is 1
+AUC for class 4 is 2
+AUC for class 4 is 3
+AUC for class 4 is 4
+For model 5:
+AUC for class 5 is 0
+AUC for class 5 is 1
+AUC for class 5 is 2
+AUC for class 5 is 3
+AUC for class 5 is 4
+For model 6:
+AUC for class 6 is 0
+AUC for class 6 is 1
+AUC for class 6 is 2
+AUC for class 6 is 3
+AUC for class 6 is 4
+For model 7:
+AUC for class 7 is 0
+AUC for class 7 is 1
+AUC for class 7 is 2
+AUC for class 7 is 3
+AUC for class 7 is 4
+For model 8:
+AUC for class 8 is 0
+AUC for class 8 is 1
+AUC for class 8 is 2
+AUC for class 8 is 3
+AUC for class 8 is 4
+For model 9:
+AUC for class 9 is 0
+AUC for class 9 is 1
+AUC for class 9 is 2
+AUC for class 9 is 3
+AUC for class 9 is 4
