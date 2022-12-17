@@ -1,0 +1,16 @@
+Classification report:               precision    recall  f1-score   support
+
+        left       0.11      1.00      0.20       170
+       right       0.00      0.00      0.00       180
+       fists       0.00      0.00      0.00       210
+        rest       0.67      0.02      0.05       830
+        feet       0.00      0.00      0.00       210
+
+    accuracy                           0.12      1600
+   macro avg       0.15      0.20      0.05      1600
+weighted avg       0.36      0.12      0.04      1600
+Confusion matrix: [[170   0   0   0   0]
+ [180   0   0   0   0]
+ [200   0   0  10   0]
+ [810   0   0  20   0]
+ [210   0   0   0   0]]

@@ -1,0 +1,60 @@
+For model 0:
+AUC for class 0 is 0.6281
+AUC for class 0 is 0.6608
+AUC for class 0 is 0.347
+AUC for class 0 is 0.7916
+AUC for class 0 is 0.6268
+For model 1:
+AUC for class 1 is 0.7487
+AUC for class 1 is 0.75
+AUC for class 1 is 0.6269
+AUC for class 1 is 0.8559
+AUC for class 1 is 0.7342
+For model 2:
+AUC for class 2 is 0.7801
+AUC for class 2 is 0.6234
+AUC for class 2 is 0.4234
+AUC for class 2 is 0.7976
+AUC for class 2 is 0.6946
+For model 3:
+AUC for class 3 is 0.6503
+AUC for class 3 is 0.7351
+AUC for class 3 is 0.6362
+AUC for class 3 is 0.7529
+AUC for class 3 is 0.557
+For model 4:
+AUC for class 4 is 0.7892
+AUC for class 4 is 0.6197
+AUC for class 4 is 0.3674
+AUC for class 4 is 0.7251
+AUC for class 4 is 0.6389
+For model 5:
+AUC for class 5 is 0.7857
+AUC for class 5 is 0.6976
+AUC for class 5 is 0.2576
+AUC for class 5 is 0.8936
+AUC for class 5 is 0.7074
+For model 6:
+AUC for class 6 is 0.7886
+AUC for class 6 is 0.7633
+AUC for class 6 is 0.6064
+AUC for class 6 is 0.8747
+AUC for class 6 is 0.666
+For model 7:
+AUC for class 7 is 0.7287
+AUC for class 7 is 0.3597
+AUC for class 7 is 0.4209
+AUC for class 7 is 0.4275
+AUC for class 7 is 0.6932
+For model 8:
+AUC for class 8 is 0.5
+AUC for class 8 is 0.5
+AUC for class 8 is 0.5
+AUC for class 8 is 0.5
+AUC for class 8 is 0.5
+For model 9:
+AUC for class 9 is 0.5278
+AUC for class 9 is 0.4319
+AUC for class 9 is 0.5947
+AUC for class 9 is 0.5786
+AUC for class 9 is 0.5409
