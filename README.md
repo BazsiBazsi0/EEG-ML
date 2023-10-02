@@ -1,10 +1,7 @@
-<center>
 
-![banner](assets/banner.png)
 # EEG-ML
+![banner](assets/banner.webp)
 EEG Signal Classification with neural networks for BMI Applications
-
-</center>
 
 ## Introduction
 
@@ -28,6 +25,10 @@ The dataset used in this project is the [EEG Motor Movement/Imagery Dataset](htt
 2. **Synthetic Data Upsampling**: To address the issue of class imbalance, synthetic data upsampling is performed. This helps in balancing the classes and provides more data for the model to learn from.
 3. **Model Training**: A machine learning model is trained using TensorFlow. The model is trained on the upsampled dataset.
 4. **Model Evaluation**: The performance of the model is evaluated on a separate test set.
+
+## Results
+The individual results are in the results folder in their respective folder.
+
 
 ## Code Usage
 
