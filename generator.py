@@ -9,7 +9,9 @@ class Generator:
     # Because i just want to use them current as a self-contained functions
     # TODO redundant lines around enumerations
     @staticmethod
-    def load_data(subject: int, data_path: str, filtering: [int, int], ch_pick_level: int) -> (np.ndarray, list, list):
+    def load_data(
+        subject: int, data_path: str, filtering: [int, int], ch_pick_level: int
+    ) -> (np.ndarray, list, list):
         """
         Return type specified. Check mypy for more info and analysis.
         For more info for return types check https://docs.python.org/3/library/typing.html and http://mypy-lang.org (its epic)
@@ -32,7 +34,7 @@ class Generator:
         task4 = [6, 10, 14]
 
         # The subject naming scheme can be adapted using zero fill(z-fill), example 'S001'
-        sub_name = 'S' + str(subject).zfill(3)
+        sub_name = "S" + str(subject).zfill(3)
 
         # Generates a path for the folder of the subject
         sub_folder = os.path.join(data_path, sub_name)
@@ -41,7 +43,9 @@ class Generator:
         # Processing each run individually for each subject
         for run in runs:
             # Here I also use zero-fill, generates the path using the folder path, with specifying the run
-            path_run = os.path.join(sub_folder, sub_name + 'R' + str(run).zfill(2) + '.edf')
+            path_run = os.path.join(
+                sub_folder, sub_name + "R" + str(run).zfill(2) + ".edf"
+            )
 
             # Finally reading the raw edf file
             raw = mne.io.read_raw_edf(path_run, preload=True)
@@ -85,13 +89,16 @@ class Generator:
             """
             # Simple debugging feedback
             print("Events from annotations: ", mne.events_from_annotations(raw_filt))
-            print('Raw annotation original descriptions: \n', raw_filt.annotations.description)
+            print(
+                "Raw annotation original descriptions: \n",
+                raw_filt.annotations.description,
+            )
 
             # if-for block with the previously defined arrays for runs
             if run in task2:
                 for index, annotation in enumerate(raw_filt.annotations.description):
                     if annotation == "T0":
-                        raw_filt.annotations.description[index] = 'B'
+                        raw_filt.annotations.description[index] = "B"
                     if annotation == "T1":
                         raw_filt.annotations.description[index] = "L"
                     if annotation == "T2":
@@ -104,7 +111,10 @@ class Generator:
                         raw_filt.annotations.description[index] = "LR"
                     if annotation == "T2":
                         raw_filt.annotations.description[index] = "F"
-            print('Raw annotation modified descriptions: \n', raw_filt.annotations.description)
+            print(
+                "Raw annotation modified descriptions: \n",
+                raw_filt.annotations.description,
+            )
             subject_runs.append(raw_filt)
 
         # After re-classifying each run into their own category the annotations are properly labeled
@@ -119,34 +129,107 @@ class Generator:
 
         # Renaming the events using a standard dictionary
         event_id = {
-            'rest': 1,
-            'both_feet': 2,
-            'left_hand': 3,
-            'both_hands': 4,
-            'right_hand': 5
+            "rest": 1,
+            "both_feet": 2,
+            "left_hand": 3,
+            "both_hands": 4,
+            "right_hand": 5,
         }
 
         # Excluding bad channels and any other data that could get in for safety
-        picks = mne.pick_types(raw_conc.info, meg=False, eeg=True, stim=False, eog=False, exclude='bads')
+        picks = mne.pick_types(
+            raw_conc.info, meg=False, eeg=True, stim=False, eog=False, exclude="bads"
+        )
         # Generating epochs
-        epochs = mne.epochs.Epochs(raw_conc, events, event_id, tmin=0, tmax=4, proj=True, picks=picks, baseline=None,
-                                   preload=True)
+        epochs = mne.epochs.Epochs(
+            raw_conc,
+            events,
+            event_id,
+            tmin=0,
+            tmax=4,
+            proj=True,
+            picks=picks,
+            baseline=None,
+            preload=True,
+        )
         # Sanity check:
-        print('EEG channels are being selected.')
+        print("EEG channels are being selected.")
 
         # Selecting channels
         # Selection lists:
 
         # Selection lists:
-        channel_pick_lvl = [['C1..', 'C2..', 'C3..', 'C4..', 'C5..', 'C6..', 'Cz..'],
-                         ['C1..', 'C2..', 'C3..', 'C4..', 'C5..', 'C6..', 'Cz..', 'Fc1.', 'Fc2.', 'Fc3.', 'Fc4.',
-                          'Fc5.', 'Fc6.', 'Fcz.', 'Cp1.', 'Cp2.', 'Cp3.', 'Cp4.', 'Cp5.', 'Cp6.', 'Cpz.'],
-                         ['C1..', 'C2..', 'C3..', 'C4..', 'C5..', 'C6..', 'Cz..', 'Fc1.', 'Fc2.', 'Fc3.', 'Fc4.',
-                          'Fc5.', 'Fc6.',  'Fcz.', 'Cp1.', 'Cp2.', 'Cp3.', 'Cp4.', 'Cp5.', 'Cp6.', 'Cpz.', 'F1..',
-                          'F2..', 'F3..', 'F4..', 'F5..', 'F6..','Fz..', 'Af3.', 'Af4.', 'Afz.', 'P1..', 'P2..', 'P3..',
-                          'P4..', 'P5..', 'P6..', 'Pz..', 'Po3.', 'Po4.','Poz.']]
+        channel_pick_lvl = [
+            ["C1..", "C2..", "C3..", "C4..", "C5..", "C6..", "Cz.."],
+            [
+                "C1..",
+                "C2..",
+                "C3..",
+                "C4..",
+                "C5..",
+                "C6..",
+                "Cz..",
+                "Fc1.",
+                "Fc2.",
+                "Fc3.",
+                "Fc4.",
+                "Fc5.",
+                "Fc6.",
+                "Fcz.",
+                "Cp1.",
+                "Cp2.",
+                "Cp3.",
+                "Cp4.",
+                "Cp5.",
+                "Cp6.",
+                "Cpz.",
+            ],
+            [
+                "C1..",
+                "C2..",
+                "C3..",
+                "C4..",
+                "C5..",
+                "C6..",
+                "Cz..",
+                "Fc1.",
+                "Fc2.",
+                "Fc3.",
+                "Fc4.",
+                "Fc5.",
+                "Fc6.",
+                "Fcz.",
+                "Cp1.",
+                "Cp2.",
+                "Cp3.",
+                "Cp4.",
+                "Cp5.",
+                "Cp6.",
+                "Cpz.",
+                "F1..",
+                "F2..",
+                "F3..",
+                "F4..",
+                "F5..",
+                "F6..",
+                "Fz..",
+                "Af3.",
+                "Af4.",
+                "Afz.",
+                "P1..",
+                "P2..",
+                "P3..",
+                "P4..",
+                "P5..",
+                "P6..",
+                "Pz..",
+                "Po3.",
+                "Po4.",
+                "Poz.",
+            ],
+        ]
 
-        print('EEG channels before selection: \n', epochs[0].ch_names)
+        print("EEG channels before selection: \n", epochs[0].ch_names)
         # select channels that are only above the central sulcus
         if ch_pick_level == 0:
             epochs.pick_channels(ch_names=channel_pick_lvl[0])
@@ -157,22 +240,22 @@ class Generator:
         elif ch_pick_level == 3:
             pass
         else:
-            print('EEG channel selection level is not defined')
+            print("EEG channel selection level is not defined")
             return
 
         if len(epochs.ch_names) == len(channel_pick_lvl[ch_pick_level]):
-            print('Channel selection successful.')
+            print("Channel selection successful.")
         else:
-            raise ValueError('Channel selection failed.')
+            raise ValueError("Channel selection failed.")
 
-        print('EEG channels remaining after selection: \n', epochs[0].ch_names)
+        print("EEG channels remaining after selection: \n", epochs[0].ch_names)
         # Construting the data labels
         y = list()
         for index, data in enumerate(epochs):
             y.append(epochs[index]._name)
 
-        # TODO: Külön szedve az adatokat """epochs.get_data..."""
-        #   epochs lekérés egyben
+        # TODO: Separate data management """epochs.get_data..."""
+        #   epochs all in one query
         # TODO check out epochs.equalize_event_counts()
 
         # Returing with exactly 4 seconds epochs in both x and y
@@ -200,7 +283,10 @@ class Generator:
 
         # Dir operations
         data_path = os.path.join(os.getcwd(), "raw_data")
-        save_path = os.path.join(os.getcwd(), "generator/all_electrodes_103_patients_ch_level_"+str(ch_pick_level))
+        save_path = os.path.join(
+            os.getcwd(),
+            "generator/all_electrodes_103_patients_ch_level_" + str(ch_pick_level),
+        )
         os.makedirs(save_path, exist_ok=True)
 
         # Generating the data, this is the part that does the processing
