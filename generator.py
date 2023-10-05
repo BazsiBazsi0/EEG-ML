@@ -13,8 +13,7 @@ class Generator:
         subject: int, data_path: str, filtering: [int, int], ch_pick_level: int
     ) -> (np.ndarray, list, list):
         """
-        Return type specified. Check mypy for more info and analysis.
-        For more info for return types check https://docs.python.org/3/library/typing.html and http://mypy-lang.org (its epic)
+        For more info for return types check https://docs.python.org/3/library/typing.html
         The BasedRaw format: https://mne.tools/stable/generated/mne.io.BaseRaw.html?highlight=baseraw#mne.io.BaseRaw
         Source is partially from https://github.com/Kubasinska/MI-EEG-1D-CNN processor
         Description of the function:
