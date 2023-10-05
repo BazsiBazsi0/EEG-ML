@@ -96,6 +96,7 @@ class FileLoader:
 
     @staticmethod
     def load_saved_files():
+        # TODO find a way to load all patients at the same time. Data is king.
         # The output for this function is patients x epochs x channels x datapoints
         # for x_no smote with 1 patient its 1 x 160 x 64 x 641 ( one patient with 160 epoch, 64 chs, and 641 datapoints)
         # for y_no_smote with 1 patient its 1 x 160 x 5 (1 patient with 160 epoch and 5 classes in each epoch)
