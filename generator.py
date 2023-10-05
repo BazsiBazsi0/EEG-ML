@@ -8,6 +8,7 @@ class Generator:
     # Using static method the function should not be dependent on initialization
     # Because i just want to use them current as a self-contained functions
     # TODO redundant lines around enumerations
+    # TODO Create a real loader class, and a real data handler class, yaml file for conf
     @staticmethod
     def load_data(
         subject: int, data_path: str, filtering: [int, int], ch_pick_level: int
