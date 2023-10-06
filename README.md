@@ -50,3 +50,9 @@ The use of synthetic data upsampling significantly improved the performance of t
 ## Future Work
 
 Future work includes exploring different upsampling techniques and machine learning models to further improve the performance. Currently I'm working on getting things into a better shape including visuals. Docker deployment and a simple showcase jupyter notebook is also on the todo list.
+
+## TODO
+- High percentage testing coverage
+- Classes
+- Modularity and expandable multi class structure
+- Demo notebook
