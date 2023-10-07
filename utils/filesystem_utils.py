@@ -49,14 +49,14 @@ class FilesystemUtils:
             if os.path.isdir(os.path.join(os.getcwd(), item))
         ]
 
-        if self.debug:
-            logger.info(dirlist)
+        logger.info(dirlist)
 
         return dirlist
 
     def open_subj_files(self, subj_single: str) -> int:
         """
         Lists the files in a certain subject directory, filters *.edf files for safety.
+        TODO: Currently not tested, evaluating the need for this
         """
         source_dir: Union[Path, str] = Path(subj_single)
         filelist: List[str] = os.listdir(source_dir)
@@ -69,7 +69,6 @@ class FilesystemUtils:
                 raw, events, event_id=event_dict, tmin=0, tmax=4, baseline=None
             )
 
-        if self.debug:
-            logger.info(filelist)
+        logger.info(filelist)
 
         return 0
