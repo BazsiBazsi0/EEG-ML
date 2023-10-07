@@ -11,9 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class FilesystemUtils:
-    def __init__(self, debug: bool = False):
-        self.debug = debug
-
     def list_files(self) -> None:
         """
         Lists files in the current working directory.
