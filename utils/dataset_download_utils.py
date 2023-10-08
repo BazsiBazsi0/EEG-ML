@@ -6,7 +6,7 @@ from tqdm import tqdm
 from typing import Any
 
 class Downloader:
-    def __init__(self, url: str, download_path: str = "../dataset") -> None:
+    def __init__(self, url: str, download_path: str = "dataset") -> None:
         self.url: str = url
         self.download_path: str = download_path
         self.logger: Any = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ class Downloader:
             # Check if the file already exists
             if not os.path.isfile(file_path):
                 self.logger.info(f"Downloading {self.url}...")
-                response: Any = requests.get(self.url, stream=True)
+                response: requests.Response = requests.get(self.url, stream=True)
                 total_size_in_bytes= int(response.headers.get('content-length', 0))
                 progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
                 with open(file_path, 'wb') as f:
