@@ -44,7 +44,3 @@ class Downloader:
                 self.logger.info(f"File {file_path} extracted.")
         except Exception as e:
             self.logger.error(f"An error occurred: {str(e)}")
-
-# Usage
-downloader = Downloader("https://physionet.org/static/published-projects/eegmmidb/eeg-motor-movementimagery-dataset-1.0.0.zip")
-downloader.download()
