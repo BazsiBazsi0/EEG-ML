@@ -1,8 +1,6 @@
 import os
-import mne
-from pathlib import Path
 import logging
-from typing import List, Union
+from typing import List
 
 # TODO validate + write a test for each function
 
@@ -52,23 +50,3 @@ class FilesystemUtils:
         logger.info(dirlist)
 
         return dirlist
-
-    def open_subj_files(self, subj_single: str) -> int:
-        """
-        Lists the files in a certain subject directory, filters *.edf files for safety.
-        TODO: Currently not tested, evaluating the need for this
-        """
-        source_dir: Union[Path, str] = Path(subj_single)
-        filelist: List[str] = os.listdir(source_dir)
-
-        for f in filelist:
-            raw = mne.io.read_raw_edf(f)
-            events, event_dict = mne.events_from_annotations(raw)
-            event_dict = dict(rest=1, left=2, right=3)
-            epochs = mne.Epochs(
-                raw, events, event_id=event_dict, tmin=0, tmax=4, baseline=None
-            )
-
-        logger.info(filelist)
-
-        return 0
