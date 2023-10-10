@@ -157,8 +157,6 @@ class Generator:
 
         # Selecting channels
         # Selection lists:
-
-        # Selection lists:
         channel_pick_lvl = [
             ["C1..", "C2..", "C3..", "C4..", "C5..", "C6..", "Cz.."],
             [
@@ -268,7 +266,7 @@ class Generator:
         """
         This method generates the data for the model
         Running time should be pretty fast unless you run it on a toaster
-        Memory should be safe but if you have a toaster you might want to monitor that
+        Memory should be safe, if you indeed have a toaster you might want to watch out.
         """
 
         # Filtering the subjects

@@ -1,0 +1,9 @@
+# basic yaml config
+
+# These are different channel levels to include in the analysis.
+# Based on this there are different dataset are prepared before training
+CH_LVL:
+  1: ["C1..", "C2..", "C3..", "C4..", "C5..", "C6..", "Cz.."]
+  2: ["C1..", "C2..", "C3..", "C4..", "C5..", "C6..", "Cz..", "Fc1.", "Fc2.", "Fc3.", "Fc4.", "Fc5.", "Fc6.", "Fcz.", "Cp1.", "Cp2.", "Cp3.", "Cp4.", "Cp5.", "Cp6.", "Cpz."]
+  3: ["C1..", "C2..", "C3..", "C4..", "C5..", "C6..", "Cz..", "Fc1.", "Fc2.", "Fc3.", "Fc4.", "Fc5.", "Fc6.", "Fcz.", "Cp1.", "Cp2.", "Cp3.", "Cp4.", "Cp5.", "Cp6.", "Cpz.", "F1..", "F2..", "F3..", "F4..", "F5..", "F6..", "Fz..", "Af3.", "Af4.", "Afz.", "P1..", "P2..", "P3..", "P4..", "P5..", "P6..", "Pz..",  "Po3.",  "Po4.",  "Poz."]
+EXCLUDED: [38, 88, 89, 92, 100, 104]

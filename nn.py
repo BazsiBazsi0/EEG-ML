@@ -1,10 +1,8 @@
-import os
 import numpy as np
 import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, roc_curve
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
-import loader
 import nn
 
 
