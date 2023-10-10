@@ -2,23 +2,22 @@ import os
 import logging
 from typing import List
 
-# TODO validate + write a test for each function
-
-# Create a custom logger
-logger = logging.getLogger(__name__)
-
 
 class FilesystemUtils:
+    def __init__(self) -> None:
+        # Create a custom logger
+        self.logger = logging.getLogger(__name__)
+
     def list_files(self) -> None:
         """
         Lists files in the current working directory.
         """
         path_of_the_directory: str = os.getcwd()
-        logger.info("Files and directories in a specified path:")
+        self.logger.info("Files and directories in a specified path:")
         for filename in os.listdir(path_of_the_directory):
             f: str = os.path.join(path_of_the_directory, filename)
             if os.path.isfile(f):
-                logger.info(f)
+                self.logger.info(f)
 
     def read_dir_files(self) -> None:
         """
@@ -33,9 +32,9 @@ class FilesystemUtils:
                 folder_paths.append(entry.path)
             elif entry.is_file():
                 files.append(entry.path)
-        logger.info("Folders:")
+        self.logger.info("Folders:")
         for f in folders:
-            logger.info(f)
+            self.logger.info(f)
 
     def dir_list(self) -> List[str]:
         """
@@ -47,6 +46,6 @@ class FilesystemUtils:
             if os.path.isdir(os.path.join(os.getcwd(), item))
         ]
 
-        logger.info(dirlist)
+        self.logger.info(dirlist)
 
         return dirlist
