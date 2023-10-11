@@ -21,22 +21,21 @@ class DatasetUtils:
 
     def generate(self):
         # Dir operations
-        data_path = os.path.join(os.getcwd(), "raw_data")
+        data_path = os.path.join(os.getcwd(), "dataset/files")
         save_path = os.path.join(
             os.getcwd(),
-            "generator/all_electrodes_103_patients_ch_level_" + str(self.ch_pick_level),
+            "dataset/filtered_data/ch_level_" + str(self.ch_pick_level),
         )
         os.makedirs(save_path, exist_ok=True)
 
         # Generating the data, this is the part that does the processing
         # After loading x and y they are saved to the save_path into a numpy file
-        for sub in self.subjects:
-            x, y = DatasetUtils.load_data(
-                sub, data_path, self.filtering, self.ch_pick_level
-            )
+        for ch_level in self.ch_pick_level:
+            for sub in self.subjects:
+                x, y = DatasetUtils.load_data(sub, data_path, self.filtering, ch_level)
 
-            np.save(os.path.join(save_path, "x_sub_" + str(sub)), x, allow_pickle=True)
-            np.save(os.path.join(save_path, "y_sub_" + str(sub)), y, allow_pickle=True)
+                np.save(os.path.join(save_path, "x_sub_" + str(sub)), x)
+                np.save(os.path.join(save_path, "y_sub_" + str(sub)), y)
 
     @staticmethod
     def load_data(
