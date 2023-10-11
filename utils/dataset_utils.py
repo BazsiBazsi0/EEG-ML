@@ -2,6 +2,7 @@ import os
 import numpy as np
 import mne
 import config
+import logging
 
 
 class DatasetUtils:
@@ -18,6 +19,8 @@ class DatasetUtils:
         self.subjects = subjects
         self.ch_pick_level = ch_pick_level
         self.filtering = filtering
+        self.logger = logging.getLogger(__name__)
+        logging.basicConfig(level=logging.INFO)
 
     def generate(self):
         # Dir operations
@@ -39,7 +42,7 @@ class DatasetUtils:
 
     @staticmethod
     def load_data(
-        subject: int, data_path: str, filtering: [int, int], ch_pick_level: int
+        self, subject: int, data_path: str, filtering: [int, int], ch_pick_level: int
     ) -> (np.ndarray, list, list):
         # The imaginary runs for indexing purposes
         runs = [4, 6, 8, 10, 12, 14]
@@ -57,35 +60,30 @@ class DatasetUtils:
 
         # Processing each run individually for each subject
         for run in runs:
-            # Here I also use zero-fill, generates the path using the folder path, with specifying the run
+            # Generate the path using the folder path, with specifying the run
             path_run = os.path.join(
                 sub_folder, sub_name + "R" + str(run).zfill(2) + ".edf"
             )
 
-            # Finally reading the raw edf file
+            # Read the raw edf file
             raw = mne.io.read_raw_edf(path_run, preload=True)
-            # Sanity check: Checking the file for a single run
-            # raw_run.plot_psd(fmax=80);
 
             # Filtering the data between 0 and 38 Hz
             raw_filt = raw.copy().filter(filtering[0], filtering[1])
 
-            # Sanity check: Checking the file for a single run after filtering
-            # raw_filt.plot_psd(fmax=80);
-
             # This trims the run to 124 seconds precisely, default is set to 125 secs
             # 125 seconds * 160 Hz = 2000 data points
-            # We need this so we dont have overflowing data
+            # Necessary so we dont have overflowing data
             if np.sum(raw_filt.annotations.duration) > 124:
                 raw_filt.crop(tmax=124)
 
             # Now we need to label epochs based on the annotations
-
             # Simple debugging feedback
-            print("Events from annotations: ", mne.events_from_annotations(raw_filt))
-            print(
-                "Raw annotation original descriptions: \n",
-                raw_filt.annotations.description,
+            self.logger.info(
+                f"Events from annotations: {mne.events_from_annotations(raw_filt)}"
+            )
+            self.logger.info(
+                f"Raw annotation original descriptions: \n{raw_filt.annotations.description}"
             )
 
             # if-for block with the previously defined arrays for runs
@@ -105,19 +103,19 @@ class DatasetUtils:
                         raw_filt.annotations.description[index] = "LR"
                     if annotation == "T2":
                         raw_filt.annotations.description[index] = "F"
-            print(
-                "Raw annotation modified descriptions: \n",
-                raw_filt.annotations.description,
+            self.logger.info(
+                f"Raw annotation original descriptions: \n\{raw_filt.annotations.description}"
             )
+
             subject_runs.append(raw_filt)
 
         # Concatenate the runs
         raw_conc = mne.io.concatenate_raws(subject_runs, preload=True)
 
-        # First I assign a dummy "event_id" variable where I dump all the relevant data about our epoch, then rename them
+        # Assign a dummy "event_id" variable where we dump all the relevant data
         events, event_id = mne.events_from_annotations(raw_conc)
 
-        # Renaming the events using a standard dictionary
+        # Renaming the dumped events using a standard dictionary
         event_id = {
             "rest": 1,
             "both_feet": 2,
@@ -143,7 +141,7 @@ class DatasetUtils:
             preload=True,
         )
         # Sanity check:
-        print("EEG channels are being selected.")
+        self.logger.info("EEG channels are being selected.")
 
         # Selecting channels
         # Selection lists:
@@ -154,7 +152,7 @@ class DatasetUtils:
             config.channel_inclusion_lvl[2],
         ]
 
-        print("EEG channels before selection: \n", epochs[0].ch_names)
+        self.logger.info(f"EEG channels before selection: \n{epochs[0].ch_names}")
         # select channels that are only above the central sulcus
         if ch_pick_level == 0:
             epochs.pick_channels(ch_names=channel_pick_lvl[0])
@@ -165,7 +163,7 @@ class DatasetUtils:
         elif ch_pick_level == 3:
             pass
         else:
-            print("EEG channel selection level is not defined")
+            self.logger.info("EEG channel selection level is not defined")
             return
 
         if len(epochs.ch_names) == len(channel_pick_lvl[ch_pick_level]):
@@ -173,13 +171,14 @@ class DatasetUtils:
         else:
             raise ValueError("Channel selection failed.")
 
-        print("EEG channels remaining after selection: \n", epochs[0].ch_names)
-        # Construting the data labels
+        self.logger.info(f"EEG channels remaining after selection: \n{epochs[0].ch_names}")
+        
+        # Constructing the data labels
         y = list()
         for index, data in enumerate(epochs):
             y.append(epochs[index]._name)
 
-        # Returing with exactly 4 seconds epochs in both x and y
+        # Retuning with exactly 4 seconds epochs in both x and y
         xs = np.array(epochs)
         xs = xs[:160, :, :]
         return xs[:160, :, :], y[:160]
