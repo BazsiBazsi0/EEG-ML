@@ -40,8 +40,15 @@ The individual results are in the results folder in their respective folder.
 To run the code, follow these steps:
 
 1. Clone the repository.
-2. Install the necessary Python packages.
-3. Run the main script.
+2. Build the dockerfile.
+```
+sudo docker build -t EEG-ML .
+```
+3. Run the docker image and mount your working folder
+```
+docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace EEG-ML:latest
+```
+5. Run the main script.
 
 ## Results
 

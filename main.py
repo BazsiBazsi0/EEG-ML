@@ -2,9 +2,17 @@ import numpy as np
 import os
 import loader
 import nn
+import tensorflow as tf
 
 # TODO make runs with non-smote + balanced data (reduce rest) + keep test balanced
 # TODO try to compare the data with oversampling the non-rest, try the same for test
+
+# List all available GPUs
+gpus = tf.config.list_physical_devices('GPU')
+
+print("Available GPUs:")
+for gpu in gpus:
+    print(gpu.name)
 
 # Only use the first available gpu/device
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
