@@ -6,4 +6,4 @@ FROM nvcr.io/nvidia/tensorflow:23.08-tf2-py3
 # RUN apt-get update && apt-get install -y \
 
 # For Python packages, use pip:
-RUN pip install --no-cache-dir numpy opencv-python-headless scikit-image pillow matplotlib
+RUN pip install --no-cache-dir numpy opencv-python-headless scikit-image pillow matplotlib imblearn
