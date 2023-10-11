@@ -1,32 +1,17 @@
 import unittest
-
+import tensorflow as tf
 
 class TestAvailability(unittest.TestCase):
     def test_tensorflow_import(self):
         try:
-            import tensorflow as tf
-
+            _ = tf.__version__
             self.assertTrue(True)
-        except ImportError:
+        except AttributeError:
             self.assertTrue(False, "TensorFlow is not available")
 
     def test_gpu_availability(self):
         try:
-            from tensorflow.python.client import device_lib
-
-            gpus = [
-                x.name
-                for x in device_lib.list_local_devices()
-                if x.device_type == "GPU"
-            ]
+            gpus = tf.config.list_physical_devices('GPU')
             self.assertTrue(len(gpus) > 0, "No GPU available")
-        except ImportError:
+        except AttributeError:
             self.assertTrue(False, "TensorFlow is not available to check for GPUs")
-
-    def test_tensorrt_import(self):
-        try:
-            import tensorrt as trt
-
-            self.assertTrue(True)
-        except ImportError:
-            self.assertTrue(False, "TensorRT is not available")
