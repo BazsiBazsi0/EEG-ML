@@ -39,20 +39,42 @@ The individual results are in the results folder in their respective folder.
 
 To run the code, follow these steps:
 
+0. pray
+
+There are many problems currently with the Tensorflow package, the easiest way running it with GPU acceleration is in a Colab or Kaggle notebook. Currently a demo notebook is on the way, once the code refactoring is finished. If you are lucky and everything is right you can run it in docker (after installing the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)) or in a venv.
+
+# Docker
 1. Clone the repository.
 2. Build the dockerfile.
 ```
 sudo docker build -t EEG-ML .
 ```
-3. Run the docker image and mount your working folder
+1. Run the docker image and mount your working folder
 ```
 docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace EEG-ML:latest
 ```
-5. Run the main script.
+1. Run the main script.
+```
+python3 main.py
+```
 
+# Local
+Make a virtual environment
+```
+python3 -m venv env
+```
+Install requirements
+```
+pip install -r requirements.txt
+```
+Run the main script
+
+```
+python3 main.py
+```
 ## Results
 
-The use of synthetic data upsampling significantly improved the performance of the machine learning model on the imbalanced EEG Motor Movement/Imagery Dataset.
+The use of synthetic data upsampling significantly improved the performance of the machine learning model on the imbalanced EEG Motor Movement/Imagery Dataset. The individual results are in the "Results" folder.
 
 ## Future Work
 
