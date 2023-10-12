@@ -1,17 +1,15 @@
 import os
 import requests
 import zipfile
-import logging
+from utils.logging_utils import Logger
 from tqdm import tqdm
-from typing import Any
 
 
 class Downloader:
     def __init__(self, url: str, download_path: str = "dataset") -> None:
         self.url: str = url
         self.download_path: str = download_path
-        self.logger: Any = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
+        self.logger: Logger = Logger(__name__)
 
     def download(self) -> None:
         filename: str = self.url.split("/")[-1]

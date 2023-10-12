@@ -2,7 +2,7 @@ import os
 import numpy as np
 import mne
 import config
-import logging
+from utils.logging_utils import Logger
 
 
 class DatasetUtils:
@@ -10,7 +10,7 @@ class DatasetUtils:
     # of the dataset. It will create the real base dataset from the raw data.
     def __init__(
         self,
-        dataset_folder: str = "dataset",
+        dataset_folder: str = "dataset/files",
         subjects: list = [n for n in np.arange(0, 103) if n not in config.excluded_pat],
         ch_pick_level: list = [config.channel_inclusion_lvl[i] for i in range(3)],
         filtering: list = [0, 38],
@@ -19,12 +19,27 @@ class DatasetUtils:
         self.subjects = subjects
         self.ch_pick_level = ch_pick_level
         self.filtering = filtering
-        self.logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
+        self.logger: Logger = Logger.getLogger(__name__)
 
     def generate(self):
+        """
+        Generate and save filtered EEG data for multiple subjects and channel levels.
+
+        This method performs the following operations:
+        1. Constructs data and save paths based on provided parameters.
+        2. Generates EEG data for different subjects and EEG channel levels.
+        3. Saves the generated data to the specified save_path.
+
+        Returns:
+            None
+
+        Note:
+            This method iterates through the subjects, generates EEG data
+            using the 'load_data' method, and saves the data in separate numpy files.
+
+        """
         # Dir operations
-        data_path = os.path.join(os.getcwd(), "dataset/files")
+        data_path = os.path.join(os.getcwd(), self.dataset_folder)
         save_path = os.path.join(
             os.getcwd(),
             "dataset/filtered_data/ch_level_" + str(self.ch_pick_level),
@@ -40,10 +55,32 @@ class DatasetUtils:
                 np.save(os.path.join(save_path, "x_sub_" + str(sub)), x)
                 np.save(os.path.join(save_path, "y_sub_" + str(sub)), y)
 
-    @staticmethod
     def load_data(
         self, subject: int, data_path: str, filtering: [int, int], ch_pick_level: int
     ) -> (np.ndarray, list, list):
+        """
+        Load and preprocess EEG data for a specific subject.
+
+        Parameters:
+            self (object): An instance of the class containing this method.
+            subject (int): The subject identifier.
+            data_path (str): The base path to the EEG data.
+            filtering (list of int): Filtering range [low_cutoff, high_cutoff].
+            ch_pick_level (int): EEG channel selection level.
+
+        Returns:
+            np.ndarray: Preprocessed EEG data (n_epochs, n_channels, n_samples).
+            list: List of labels for each epoch.
+            list: List of event descriptions.
+
+        Note:
+            This function loads EEG data for a specific subject, performs preprocessing,
+            and returns the preprocessed data along with labels and event descriptions.
+
+        Raises:
+            ValueError: If an invalid `ch_pick_level` is provided.
+
+        """
         # The imaginary runs for indexing purposes
         runs = [4, 6, 8, 10, 12, 14]
         # fists
@@ -51,7 +88,7 @@ class DatasetUtils:
         # legs
         task4 = [6, 10, 14]
 
-        # The subject naming scheme can be adapted using zero fill(z-fill), example 'S001'
+        # The subject naming scheme can be adapted using zero fill, example 'S001'
         sub_name = "S" + str(subject).zfill(3)
 
         # Generates a path for the folder of the subject
@@ -83,7 +120,7 @@ class DatasetUtils:
                 f"Events from annotations: {mne.events_from_annotations(raw_filt)}"
             )
             self.logger.info(
-                f"Raw annotation original descriptions: \n{raw_filt.annotations.description}"
+                f"Raw original annotation: \n{raw_filt.annotations.description}"
             )
 
             # if-for block with the previously defined arrays for runs
@@ -104,7 +141,7 @@ class DatasetUtils:
                     if annotation == "T2":
                         raw_filt.annotations.description[index] = "F"
             self.logger.info(
-                f"Raw annotation original descriptions: \n\{raw_filt.annotations.description}"
+                f"Raw original annotations: \n\{raw_filt.annotations.description}"
             )
 
             subject_runs.append(raw_filt)
@@ -163,16 +200,17 @@ class DatasetUtils:
         elif ch_pick_level == 3:
             pass
         else:
-            self.logger.info("EEG channel selection level is not defined")
-            return
+            raise ValueError("EEG channel selection level is not defined or invalid.")
 
         if len(epochs.ch_names) == len(channel_pick_lvl[ch_pick_level]):
-            print("Channel selection successful.")
+            self.logger.info("Channel selection successful.")
         else:
             raise ValueError("Channel selection failed.")
 
-        self.logger.info(f"EEG channels remaining after selection: \n{epochs[0].ch_names}")
-        
+        self.logger.info(
+            f"EEG channels remaining after selection: \n{epochs[0].ch_names}"
+        )
+
         # Constructing the data labels
         y = list()
         for index, data in enumerate(epochs):
