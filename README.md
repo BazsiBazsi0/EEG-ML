@@ -37,7 +37,7 @@ The individual results are in the results folder in their respective folder.
 
 ## Code Usage
 
-To run the code, follow these steps:
+To run the code use linux or WSL, and follow these steps:
 
 0. pray
 
