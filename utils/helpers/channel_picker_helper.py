@@ -1,4 +1,4 @@
-class ChannelPicker:
+class ChannelPickerHelper:
     @staticmethod
     def pick_channels(epochs, channel_levels, ch_pick_level, logger):
         """

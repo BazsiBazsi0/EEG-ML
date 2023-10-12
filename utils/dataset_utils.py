@@ -3,6 +3,8 @@ import numpy as np
 import mne
 import config
 from utils.logging_utils import Logger
+from utils.helpers.channel_picker_helper import ChannelPickerHelper
+from utils.helpers.epoch_creator_helper import EpochCreatorHelper
 
 
 class DatasetUtils:
@@ -161,55 +163,11 @@ class DatasetUtils:
             "right_hand": 5,
         }
 
-        # Excluding bad channels and any other data that could get in for safety
-        picks = mne.pick_types(
-            raw_conc.info, meg=False, eeg=True, stim=False, eog=False, exclude="bads"
-        )
-        # Generating epochs
-        epochs = mne.epochs.Epochs(
-            raw_conc,
-            events,
-            event_id,
-            tmin=0,
-            tmax=4,
-            proj=True,
-            picks=picks,
-            baseline=None,
-            preload=True,
-        )
-        # Sanity check:
-        self.logger.info("EEG channels are being selected.")
+        # Generating specific EEG epochs
+        epochs = EpochCreatorHelper.create_epochs(raw_conc, events, event_id)
 
-        # Selecting channels
-        # Selection lists:
-
-        channel_pick_lvl: list = [
-            config.channel_inclusion_lvl[0],
-            config.channel_inclusion_lvl[1],
-            config.channel_inclusion_lvl[2],
-        ]
-
-        self.logger.info(f"EEG channels before selection: \n{epochs[0].ch_names}")
-        # select channels that are only above the central sulcus
-        if ch_pick_level == 0:
-            epochs.pick_channels(ch_names=channel_pick_lvl[0])
-        elif ch_pick_level == 1:
-            epochs.pick_channels(ch_names=channel_pick_lvl[1])
-        elif ch_pick_level == 2:
-            epochs.pick_channels(ch_names=channel_pick_lvl[2])
-        elif ch_pick_level == 3:
-            pass
-        else:
-            raise ValueError("EEG channel selection level is not defined or invalid.")
-
-        if len(epochs.ch_names) == len(channel_pick_lvl[ch_pick_level]):
-            self.logger.info("Channel selection successful.")
-        else:
-            raise ValueError("Channel selection failed.")
-
-        self.logger.info(
-            f"EEG channels remaining after selection: \n{epochs[0].ch_names}"
-        )
+        # Picking the channels based on the channel level
+        epochs = ChannelPickerHelper.pick_channels(epochs, ch_pick_level, self.logger)
 
         # Constructing the data labels
         y = list()
