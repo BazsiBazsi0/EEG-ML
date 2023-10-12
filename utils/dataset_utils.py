@@ -2,6 +2,7 @@ import os
 import numpy as np
 import mne
 import config
+from typing import List, Tuple
 from utils.logging_utils import Logger
 from utils.helpers.channel_picker_helper import ChannelPickerHelper
 from utils.helpers.epoch_creator_helper import EpochCreatorHelper
@@ -58,30 +59,23 @@ class DatasetUtils:
                 np.save(os.path.join(save_path, "y_sub_" + str(sub)), y)
 
     def load_data(
-        self, subject: int, data_path: str, filtering: [int, int], ch_pick_level: int
-    ) -> (np.ndarray, list, list):
+        self,
+        subject: int,
+        data_path: str,
+        filtering: List[int, int],
+        ch_pick_level: int,
+    ) -> Tuple[np.ndarray, List[str]]:
         """
-        Load and preprocess EEG data for a specific subject.
+        Load data for a specific subject and return processed data and labels.
 
-        Parameters:
-            self (object): An instance of the class containing this method.
-            subject (int): The subject identifier.
-            data_path (str): The base path to the EEG data.
-            filtering (list of int): Filtering range [low_cutoff, high_cutoff].
-            ch_pick_level (int): EEG channel selection level.
+        Args:
+            subject (int): The subject ID.
+            data_path (str): Path to the data directory.
+            filtering (List[int, int]): Filtering frequency range [low, high].
+            ch_pick_level (int): Channel pick level.
 
         Returns:
-            np.ndarray: Preprocessed EEG data (n_epochs, n_channels, n_samples).
-            list: List of labels for each epoch.
-            list: List of event descriptions.
-
-        Note:
-            This function loads EEG data for a specific subject, performs preprocessing,
-            and returns the preprocessed data along with labels and event descriptions.
-
-        Raises:
-            ValueError: If an invalid `ch_pick_level` is provided.
-
+            Tuple[np.ndarray, List[str]]: Processed data and corresponding labels.
         """
         # The imaginary runs for indexing purposes
         runs = [4, 6, 8, 10, 12, 14]
@@ -89,71 +83,138 @@ class DatasetUtils:
         task2 = [4, 8, 12]
         # legs
         task4 = [6, 10, 14]
-
         # The subject naming scheme can be adapted using zero fill, example 'S001'
         sub_name = "S" + str(subject).zfill(3)
-
         # Generates a path for the folder of the subject
         sub_folder = os.path.join(data_path, sub_name)
         subject_runs = []
 
-        # Processing each run individually for each subject
         for run in runs:
-            # Generate the path using the folder path, with specifying the run
             path_run = os.path.join(
                 sub_folder, sub_name + "R" + str(run).zfill(2) + ".edf"
             )
+            raw_filt = self.process_raw_edf(path_run, filtering)
+            epochs = self.label_epochs(raw_filt, run, task2, task4)
+            subject_runs.append(epochs)
 
-            # Read the raw edf file
-            raw = mne.io.read_raw_edf(path_run, preload=True)
+        xs, y = self.concat_and_return_data(subject_runs)
+        return xs, y
 
-            # Filtering the data between 0 and 38 Hz
-            raw_filt = raw.copy().filter(filtering[0], filtering[1])
+    def process_raw_edf(self, path_run: str, filtering: List[int, int]) -> mne.io.Raw:
+        """
+        Process the raw EDF data file.
 
-            # This trims the run to 124 seconds precisely, default is set to 125 secs
-            # 125 seconds * 160 Hz = 2000 data points
-            # Necessary so we dont have overflowing data
-            if np.sum(raw_filt.annotations.duration) > 124:
-                raw_filt.crop(tmax=124)
+        Args:
+            path_run (str): Path to the EDF data file.
+            filtering (List[int, int]): Filtering frequency range [low, high].
 
-            # Now we need to label epochs based on the annotations
-            # Simple debugging feedback
-            self.logger.info(
-                f"Events from annotations: {mne.events_from_annotations(raw_filt)}"
+        Returns:
+            mne.io.Raw: Processed raw data.
+        """
+        # Read the raw edf file
+        raw = mne.io.read_raw_edf(path_run, preload=True)
+        # Filtering the data between 0 and 38 Hz
+        raw_filt = raw.copy().filter(filtering[0], filtering[1])
+        # This trims the run to 124 seconds precisely, default is set to 125 secs
+        # 125 seconds * 160 Hz = 2000 data points
+        # Necessary so we dont have overflowing data
+        if np.sum(raw_filt.annotations.duration) > 124:
+            raw_filt.crop(tmax=124)
+        # Simple debugging feedback
+        self.logger.debug(
+            f"Events from annotations: \n{mne.events_from_annotations(raw_filt)}"
+        )
+        self.logger.debug(
+            f"Raw original annotation: \n{raw_filt.annotations.description}"
+        )
+        return raw_filt
+
+    def label_epochs(
+        self, raw_filt: mne.io.Raw, run: int, task2: List[int], task4: List[int]
+    ) -> mne.Epochs:
+        """
+        Label epochs based on task-specific annotations.
+
+        Args:
+            raw_filt (mne.io.Raw): Processed raw data.
+            run (int): Current run number.
+            task2 (List[int]): Run numbers for task2.
+            task4 (List[int]): Run numbers for task4.
+
+        Returns:
+            mne.Epochs: Labeled epochs.
+
+        Labeled annotations:
+            - 'B' indicates baseline.
+            - 'L' indicates motor imagination of opening and closing the left fist.
+            - 'R' indicates motor imagination of opening and closing the right fist.
+            - 'LR' indicates motor imagination of opening and closing both fists.
+            - 'F' indicates motor imagination of moving both feet.
+
+        The annotation description of the raw runs have <u2 (2 char unicode)
+        dtype: {dtype[str_]:()} <U2.
+
+        Description of the built-in data annotations:
+            - The description for each run describes the sequence of
+            - 'T0': rest
+            - 'T1': motion real/imaginary
+                - the left fist (in runs 3, 4, 7, 8, 11, and 12)
+                - both fists (in runs 5, 6, 9, 10, 13, and 14)
+            - 'T2': motion real/imaginary
+                - the right fist (in runs 3, 4, 7, 8, 11, and 12)
+                - both feet (in runs 5, 6, 9, 10, 13, and 14)
+
+        If we print out the annotation descriptions,
+        we would get 'T0' between all of the 'T1' and 'T2' annotations.
+        It is easily recognizable that the meaning of 'T0-1-2'
+        descriptions is dependent on the run numbers.
+        """
+        if run in task2:
+            raw_filt.annotations.description = self.label_annotations(
+                raw_filt.annotations.description, ["T0", "T1", "T2"], ["B", "L", "R"]
             )
-            self.logger.info(
-                f"Raw original annotation: \n{raw_filt.annotations.description}"
+        elif run in task4:
+            raw_filt.annotations.description = self.label_annotations(
+                raw_filt.annotations.description, ["T0", "T1", "T2"], ["B", "LR", "F"]
             )
+        return raw_filt
 
-            # if-for block with the previously defined arrays for runs
-            if run in task2:
-                for index, annotation in enumerate(raw_filt.annotations.description):
-                    if annotation == "T0":
-                        raw_filt.annotations.description[index] = "B"
-                    if annotation == "T1":
-                        raw_filt.annotations.description[index] = "L"
-                    if annotation == "T2":
-                        raw_filt.annotations.description[index] = "R"
-            if run in task4:
-                for index, annotation in enumerate(raw_filt.annotations.description):
-                    if annotation == "T0":
-                        raw_filt.annotations.description[index] = "B"
-                    if annotation == "T1":
-                        raw_filt.annotations.description[index] = "LR"
-                    if annotation == "T2":
-                        raw_filt.annotations.description[index] = "F"
-            self.logger.info(
-                f"Raw original annotations: \n\{raw_filt.annotations.description}"
-            )
+    def label_annotations(
+        self, descriptions: List[str], old_labels: List[str], new_labels: List[str]
+    ) -> List[str]:
+        """
+        Label annotations based on a mapping of old labels to new labels.
 
-            subject_runs.append(raw_filt)
+        Args:
+            descriptions (List[str]): List of annotations.
+            old_labels (List[str]): List of old labels.
+            new_labels (List[str]): List of new labels.
 
+        Returns:
+            List[str]: Updated annotations.
+        """
+        for i, desc in enumerate(descriptions):
+            if desc in old_labels:
+                descriptions[i] = new_labels[old_labels.index(desc)]
+        return descriptions
+
+    def concat_and_return_data(
+        self, subject_runs: List[mne.Epochs], ch_pick_level: int
+    ) -> Tuple[np.ndarray, List[str]]:
+        """
+        Concatenate data from multiple runs and return processed data and labels.
+
+        Args:
+            subject_runs (List[mne.Epochs]): List of processed data from different runs.
+            ch_pick_level (int): EEG channel selection level.
+
+        Returns:
+            Tuple[np.ndarray, List[str]]: Concatenated data and labels.
+        """
         # Concatenate the runs
         raw_conc = mne.io.concatenate_raws(subject_runs, preload=True)
-
         # Assign a dummy "event_id" variable where we dump all the relevant data
         events, event_id = mne.events_from_annotations(raw_conc)
-
         # Renaming the dumped events using a standard dictionary
         event_id = {
             "rest": 1,
@@ -162,19 +223,11 @@ class DatasetUtils:
             "both_hands": 4,
             "right_hand": 5,
         }
-
         # Generating specific EEG epochs
         epochs = EpochCreatorHelper.create_epochs(raw_conc, events, event_id)
-
         # Picking the channels based on the channel level
         epochs = ChannelPickerHelper.pick_channels(epochs, ch_pick_level, self.logger)
-
         # Constructing the data labels
-        y = list()
-        for index, data in enumerate(epochs):
-            y.append(epochs[index]._name)
-
-        # Retuning with exactly 4 seconds epochs in both x and y
-        xs = np.array(epochs)
-        xs = xs[:160, :, :]
-        return xs[:160, :, :], y[:160]
+        y = [epoch._name for epoch in epochs][:160]
+        xs = np.array(epochs)[:160, :, :]
+        return xs, y
