@@ -1,8 +1,9 @@
 import os
 import numpy as np
 import mne
-import config
 from typing import List, Tuple
+from utils.config import excluded_pat
+from utils.config import channel_inclusion_lvl
 from utils.logging_utils import Logger
 from utils.helpers.channel_picker_helper import ChannelPickerHelper
 from utils.helpers.epoch_creator_helper import EpochCreatorHelper
@@ -14,15 +15,15 @@ class DatasetUtils:
     def __init__(
         self,
         dataset_folder: str = "dataset/files",
-        subjects: list = [n for n in np.arange(0, 103) if n not in config.excluded_pat],
-        ch_pick_level: list = [config.channel_inclusion_lvl[i] for i in range(3)],
-        filtering: list = [0, 38],
+        subjects: list = [n for n in np.arange(0, 103) if n not in excluded_pat],
+        ch_pick_level: list = channel_inclusion_lvl,
+        filtering: Tuple[int, int] = [0, 38],
     ):
         self.dataset_folder = dataset_folder
         self.subjects = subjects
         self.ch_pick_level = ch_pick_level
         self.filtering = filtering
-        self.logger: Logger = Logger.getLogger(__name__)
+        self.logger: Logger = Logger(__name__)
 
     def generate(self):
         """
@@ -43,17 +44,24 @@ class DatasetUtils:
         """
         # Dir operations
         data_path = os.path.join(os.getcwd(), self.dataset_folder)
-        save_path = os.path.join(
-            os.getcwd(),
-            "dataset/filtered_data/ch_level_" + str(self.ch_pick_level),
-        )
-        os.makedirs(save_path, exist_ok=True)
 
         # Generating the data, this is the part that does the processing
         # After loading x and y they are saved to the save_path into a numpy file
-        for ch_level in self.ch_pick_level:
+        for ch_level in self.ch_pick_level.keys():
             for sub in self.subjects:
-                x, y = DatasetUtils.load_data(sub, data_path, self.filtering, ch_level)
+                save_path = os.path.join(
+                    os.getcwd(),
+                    "dataset/filtered_data/ch_level_" + str(ch_level),
+                )
+                os.makedirs(save_path, exist_ok=True)
+
+                x, y = DatasetUtils.load_data(
+                    self,
+                    subject=sub + 1,
+                    data_path=data_path,
+                    filtering=self.filtering,
+                    ch_pick_level=ch_level,
+                )
 
                 np.save(os.path.join(save_path, "x_sub_" + str(sub)), x)
                 np.save(os.path.join(save_path, "y_sub_" + str(sub)), y)
@@ -62,7 +70,7 @@ class DatasetUtils:
         self,
         subject: int,
         data_path: str,
-        filtering: List[int, int],
+        filtering: Tuple[int, int],
         ch_pick_level: int,
     ) -> Tuple[np.ndarray, List[str]]:
         """
@@ -100,7 +108,7 @@ class DatasetUtils:
         xs, y = self.concat_and_return_data(subject_runs)
         return xs, y
 
-    def process_raw_edf(self, path_run: str, filtering: List[int, int]) -> mne.io.Raw:
+    def process_raw_edf(self, path_run: str, filtering: Tuple[int, int]) -> mne.io.Raw:
         """
         Process the raw EDF data file.
 
@@ -121,10 +129,10 @@ class DatasetUtils:
         if np.sum(raw_filt.annotations.duration) > 124:
             raw_filt.crop(tmax=124)
         # Simple debugging feedback
-        self.logger.debug(
+        self.logger.info(
             f"Events from annotations: \n{mne.events_from_annotations(raw_filt)}"
         )
-        self.logger.debug(
+        self.logger.info(
             f"Raw original annotation: \n{raw_filt.annotations.description}"
         )
         return raw_filt

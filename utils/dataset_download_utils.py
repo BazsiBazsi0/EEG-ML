@@ -38,10 +38,22 @@ class Downloader:
 
             # If it's a zip file, extract it
             if zipfile.is_zipfile(file_path):
-                self.logger.info(f"Extracting {file_path}...")
                 with zipfile.ZipFile(file_path, "r") as zip_ref:
-                    for member in tqdm(zip_ref.infolist(), desc="Extracting "):
-                        zip_ref.extract(member, self.download_path)
-                self.logger.info(f"File {file_path} extracted.")
+                    if all(
+                        [
+                            os.path.exists(
+                                os.path.join(self.download_path, member.filename)
+                            )
+                            for member in zip_ref.infolist()
+                        ]
+                    ):
+                        self.logger.info(
+                            f"All files in {file_path} are already extracted."
+                        )
+                    else:
+                        self.logger.info(f"Extracting {file_path}...")
+                        for member in tqdm(zip_ref.infolist(), desc="Extracting "):
+                            zip_ref.extract(member, self.download_path)
+                        self.logger.info(f"File {file_path} extracted.")
         except Exception as e:
             self.logger.error(f"An error occurred: {str(e)}")
