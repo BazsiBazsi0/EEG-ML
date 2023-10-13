@@ -64,6 +64,11 @@ Make a virtual environment
 python3 -m venv env
 ```
 Install requirements
+
+Install tensorflow
+```
+python3 -m pip install tensorflow[and-cuda]
+```
 ```
 pip install -r requirements.txt
 ```
