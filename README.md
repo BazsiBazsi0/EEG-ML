@@ -36,6 +36,7 @@ The individual results are in the results folder in their respective folder.
 
 
 ## Code Usage
+For the first time running its gonna take some time to download the raw dataset and generate the filtered data.
 
 To run the code use linux or WSL, and follow these steps:
 
