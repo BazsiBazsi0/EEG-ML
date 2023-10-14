@@ -1,3 +1,4 @@
+import os
 import logging
 
 
@@ -10,9 +11,11 @@ class Logger:
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
 
-        file_handler = logging.FileHandler(f"{name}.log")
-        file_handler.setFormatter(formatter)
+        if not os.path.exists("logs"):
+            os.makedirs("logs")
 
+        file_handler = logging.FileHandler(f"logs/{name}.log")
+        file_handler.setFormatter(formatter)
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
 
