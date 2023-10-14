@@ -53,19 +53,40 @@ class DatasetUtils:
                     os.getcwd(),
                     "dataset/filtered_data/ch_level_" + str(ch_level),
                 )
-                os.makedirs(save_path, exist_ok=True)
 
-                x, y = DatasetUtils.load_data(
-                    self,
-                    subject=sub + 1,
-                    data_path=data_path,
-                    filtering=self.filtering,
-                    channel_level=ch_level,
-                    channel_picks=ch_picks,
-                )
+                try:
+                    os.makedirs(save_path)
+                    self.logger.info(f"Directory {save_path} created.")
+                except FileExistsError:
+                    self.logger.warning(f"Directory {save_path} already exists.")
 
-                np.save(os.path.join(save_path, "x_sub_" + str(sub)), x)
-                np.save(os.path.join(save_path, "y_sub_" + str(sub)), y)
+                x_file_path = os.path.join(save_path, "x_sub_" + str(sub) + ".npy")
+                y_file_path = os.path.join(save_path, "y_sub_" + str(sub) + ".npy")
+
+                if os.path.exists(x_file_path) and os.path.exists(y_file_path):
+                    self.logger.warning(
+                        f"Files for subject {sub} at channel level {ch_level} already exist."
+                    )
+                    continue
+
+                try:
+                    x, y = self.load_data(
+                        subject=sub + 1,
+                        data_path=data_path,
+                        filtering=self.filtering,
+                        channel_level=ch_level,
+                        channel_picks=ch_picks,
+                    )
+
+                    np.save(x_file_path, x)
+                    np.save(y_file_path, y)
+                    self.logger.info(
+                        f"Data for subject {sub} at channel level {ch_level} saved."
+                    )
+                except Exception as e:
+                    self.logger.error(
+                        f"Error occurred while processing data for subject {sub} at channel level {ch_level}: {str(e)}"
+                    )
 
     def load_data(
         self,
