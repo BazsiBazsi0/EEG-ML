@@ -16,12 +16,12 @@ class DatasetUtils:
         self,
         dataset_folder: str = "dataset/files",
         subjects: list = [n for n in np.arange(0, 103) if n not in excluded_pat],
-        ch_pick_level: list = channel_inclusion_lvl,
+        channel_level: list = channel_inclusion_lvl,
         filtering: Tuple[int, int] = [0, 38],
     ):
         self.dataset_folder = dataset_folder
         self.subjects = subjects
-        self.ch_pick_level = ch_pick_level
+        self.channel_level = channel_level
         self.filtering = filtering
         self.logger: Logger = Logger(__name__)
 
@@ -47,7 +47,7 @@ class DatasetUtils:
 
         # Generating the data, this is the part that does the processing
         # After loading x and y they are saved to the save_path into a numpy file
-        for ch_level in self.ch_pick_level.keys():
+        for ch_level, ch_picks in self.channel_level.items():
             for sub in self.subjects:
                 save_path = os.path.join(
                     os.getcwd(),
@@ -60,7 +60,8 @@ class DatasetUtils:
                     subject=sub + 1,
                     data_path=data_path,
                     filtering=self.filtering,
-                    ch_pick_level=ch_level,
+                    channel_level=ch_level,
+                    channel_picks=ch_picks,
                 )
 
                 np.save(os.path.join(save_path, "x_sub_" + str(sub)), x)
@@ -71,7 +72,8 @@ class DatasetUtils:
         subject: int,
         data_path: str,
         filtering: Tuple[int, int],
-        ch_pick_level: int,
+        channel_level: int,
+        channel_picks: list,
     ) -> Tuple[np.ndarray, List[str]]:
         """
         Load data for a specific subject and return processed data and labels.
@@ -80,7 +82,8 @@ class DatasetUtils:
             subject (int): The subject ID.
             data_path (str): Path to the data directory.
             filtering (List[int, int]): Filtering frequency range [low, high].
-            ch_pick_level (int): Channel pick level.
+            channel_level (int): Channel level.
+            channel_picks (list): Channel picks on a level.
 
         Returns:
             Tuple[np.ndarray, List[str]]: Processed data and corresponding labels.
@@ -105,7 +108,7 @@ class DatasetUtils:
             epochs = self.label_epochs(raw_filt, run, task2, task4)
             subject_runs.append(epochs)
 
-        xs, y = self.concat_and_return_data(subject_runs)
+        xs, y = self.concat_and_return_data(subject_runs, channel_level, channel_picks)
         return xs, y
 
     def process_raw_edf(self, path_run: str, filtering: Tuple[int, int]) -> mne.io.Raw:
@@ -207,14 +210,18 @@ class DatasetUtils:
         return descriptions
 
     def concat_and_return_data(
-        self, subject_runs: List[mne.Epochs], ch_pick_level: int
+        self,
+        subject_runs: List[mne.Epochs],
+        channel_level: list,
+        channel_picks: list,
     ) -> Tuple[np.ndarray, List[str]]:
         """
         Concatenate data from multiple runs and return processed data and labels.
 
         Args:
             subject_runs (List[mne.Epochs]): List of processed data from different runs.
-            ch_pick_level (int): EEG channel selection level.
+            channel_level (int): Channel level.
+            channel_picks (list): Channel picks on a level.
 
         Returns:
             Tuple[np.ndarray, List[str]]: Concatenated data and labels.
@@ -234,8 +241,10 @@ class DatasetUtils:
         # Generating specific EEG epochs
         epochs = EpochCreatorHelper.create_epochs(raw_conc, events, event_id)
         # Picking the channels based on the channel level
-        epochs = ChannelPickerHelper.pick_channels(epochs, ch_pick_level, self.logger)
+        epochs = ChannelPickerHelper.pick_channels(
+            epochs, channel_level, channel_picks, self.logger
+        )
         # Constructing the data labels
-        y = [epoch._name for epoch in epochs][:160]
+        y = [epoch for epoch in epochs][:160]
         xs = np.array(epochs)[:160, :, :]
         return xs, y
