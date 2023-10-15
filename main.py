@@ -14,6 +14,8 @@ if __name__ == "__main__":
     dataset_utils = DatasetUtils()
     dataset_utils.generate()
 
+
+    
     x, y = loader.FileLoader.load_saved_files()
     # x_fft, y_fft = nn.NeuralNets.fft_processor(x_no_smote, y_no_smote)
     # x_no_rest, y_no_rest = loader.FileLoader.data_equalizer(x_no_smote, y_no_smote)

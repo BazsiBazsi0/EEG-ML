@@ -132,6 +132,7 @@ class DatasetUtils:
             using the 'load_data' method, and saves the data in separate numpy files.
 
         """
+        
         # Dir operations
         data_path = os.path.join(os.getcwd(), self.dataset_folder)
 
