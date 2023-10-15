@@ -6,7 +6,7 @@ from typing import List
 class FilesystemUtils:
     def __init__(self) -> None:
         # Create a custom logger
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger(__name__)
 
     def list_files(self) -> None:
         """

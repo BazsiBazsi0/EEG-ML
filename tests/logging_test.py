@@ -6,7 +6,7 @@ from utils.logging_utils import Logger
 class TestLogger(unittest.TestCase):
     def setUp(self):
         self.logger = Logger("test_logger")
-        self.log_file = "test_logger.log"
+        self.log_file = "logs/test_logger.log"
 
     def tearDown(self):
         if os.path.exists(self.log_file):

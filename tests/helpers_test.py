@@ -32,15 +32,17 @@ class TestHelpers(unittest.TestCase):
         )  # Modified this line
 
         # Define channel levels
-        channel_levels = [["ch1", "ch2"], ["ch1"]]
+        channel_levels: int = 1
+
+        channel_picks: list = ["ch1", "ch2"]
 
         # Test valid channel selection
-        ChannelPickerHelper.pick_channels(epochs, channel_levels, 0, logger)
+        ChannelPickerHelper.pick_channels(epochs, channel_levels, channel_picks, logger)
         self.assertEqual(epochs.ch_names, ["ch1", "ch2"], "Channel selection failed.")
 
         # Test no channel selection
         ChannelPickerHelper.pick_channels(
-            epochs, channel_levels, len(channel_levels), logger
+            epochs, channel_levels, channel_picks, logger
         )
         self.assertEqual(
             epochs.ch_names, ["ch1", "ch2"], "Channels should not be changed."
@@ -49,12 +51,12 @@ class TestHelpers(unittest.TestCase):
         # Test invalid channel selection level
         with self.assertRaises(ValueError):
             ChannelPickerHelper.pick_channels(
-                epochs, channel_levels, len(channel_levels) + 1, logger
+                epochs, channel_levels, info.ch_names, logger
             )
 
-        # Test failed channel selection
+        # Test failed channel selection, level higher then 3 should include all
         with self.assertRaises(ValueError):
-            ChannelPickerHelper.pick_channels(epochs, [["ch4"]], 0, logger)
+            ChannelPickerHelper.pick_channels(epochs, 5, [["ch4"]], logger)
 
     def test_create_epochs(self):
         epochs = EpochCreatorHelper.create_epochs(
