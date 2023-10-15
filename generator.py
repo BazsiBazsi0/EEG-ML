@@ -2,6 +2,8 @@ import os
 import numpy as np
 import mne
 
+from utils.dataset_utils import init_arguments
+
 
 # This class generates files to be used for loading later on
 class Generator:
@@ -27,18 +29,7 @@ class Generator:
         """
 
         # The imaginary runs for indexing purposes
-        runs = [4, 6, 8, 10, 12, 14]
-        # fists
-        task2 = [4, 8, 12]
-        # legs
-        task4 = [6, 10, 14]
-
-        # The subject naming scheme can be adapted using zero fill(z-fill), example 'S001'
-        sub_name = "S" + str(subject).zfill(3)
-
-        # Generates a path for the folder of the subject
-        sub_folder = os.path.join(data_path, sub_name)
-        subject_runs = []
+        runs, sub_folder, sub_name, subject_runs, task2, task4 = init_arguments(data_path, subject)
 
         # Processing each run individually for each subject
         for run in runs:
