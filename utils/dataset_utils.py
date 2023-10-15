@@ -71,7 +71,8 @@ class DatasetUtils:
 
                 if os.path.exists(x_file_path) and os.path.exists(y_file_path):
                     self.logger.warning(
-                        f"Files for subject {sub} at channel level {ch_level} already exist."
+                        f"Files for subject {sub} at channel level "
+                        f"{ch_level} already exist."
                     )
                     continue
 
@@ -91,7 +92,8 @@ class DatasetUtils:
                     )
                 except Exception as e:
                     self.logger.error(
-                        f"Error occurred while processing data for subject {sub} at channel level {ch_level}: {str(e)}"
+                        f"Error occurred while processing data for subject {sub} "
+                        f"at channel level {ch_level}: {str(e)}"
                     )
 
     def load_data(
