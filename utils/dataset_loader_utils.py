@@ -1,61 +1,9 @@
 import numpy as np
-from imblearn.over_sampling import SMOTE
-from sklearn.preprocessing import minmax_scale
-from tensorflow.keras.utils import to_categorical
-import nn
-
 
 class FileLoader:
-    # TODO: Testing
     def __init__(self, patients=10, subjects=range(60, 70)):
         self.patients = patients
         self.subjects = subjects
-
-    def to_one_hot(self, y):
-        # shallow copy to a new array
-        y_shallow_copy = y.copy()
-        # New unique labels in case of double vals(maybe there are duplicates)
-        total_labels = np.unique(y_shallow_copy)
-
-        # Dictionary named encoding for labels
-        encoding = {}
-        for x in range(len(total_labels)):
-            encoding[total_labels[x]] = x
-        for x in range(len(y_shallow_copy)):
-            y_shallow_copy[x] = encoding[y_shallow_copy[x]]
-
-        return to_categorical(y_shallow_copy)
-
-    def smote_processor(self, x, y):
-        sm = SMOTE(random_state=42)
-        x_resampled, y_resampled = sm.fit_resample(x, y)
-        return x_resampled, y_resampled
-
-    def preprocessor(self, x, y):
-        # Reshaping to 2D
-        x_reshaped = np.reshape(x, (x.shape[0], x.shape[1] * x.shape[2])).astype(
-            np.float16
-        )
-
-        # Minmax scaling
-        x_scaled = minmax_scale(x_reshaped, axis=1).astype(np.float16)
-
-        # One_hot encoding
-        y_one_hot = self.to_one_hot(y).astype(np.uintc)
-
-        # Synthetic Minority Oversampling Technique
-        x_smote, y_smote = self.smote_processor(x_scaled, y_one_hot)
-
-        # Reshaping back into the orig 3D format
-        # Structure: Epochs x Channels x Datapoints
-        x_smote = np.reshape(
-            x_smote, (x_smote.shape[0], x.shape[1], x_smote.shape[1] // x.shape[1])
-        )
-        x_no_smote = np.reshape(
-            x_scaled, (x_scaled.shape[0], x.shape[1], x_scaled.shape[1] // x.shape[1])
-        )
-
-        return x_smote, y_smote, x_no_smote, y_one_hot
 
     def load_saved_files_val(self):
         xs, ys = [], []

@@ -3,23 +3,14 @@ import mne
 import numpy as np
 from unittest.mock import Mock
 from utils.helpers.channel_picker_helper import ChannelPickerHelper
-from utils.helpers.epoch_creator_helper import EpochCreatorHelper
 
 
-class TestHelpers(unittest.TestCase):
+class TestChannelPickerHelper(unittest.TestCase):
     def setUp(self):
         # Creating a mock raw object, with "eeg" channels
         self.raw_conc = mne.io.RawArray(
             np.random.rand(10, 1000), mne.create_info(10, 1000, ch_types="eeg")
         )
-        self.events = np.array([[200, 0, 1]])
-        self.event_id = {"event": 1}
-        self.tmin = 0
-        self.tmax = 4
-        self.proj = True
-        self.picks = None
-        self.baseline = None
-        self.preload = True
 
     def test_pick_channels(self):
         # Create a mock logger
@@ -41,9 +32,7 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(epochs.ch_names, ["ch1", "ch2"], "Channel selection failed.")
 
         # Test no channel selection
-        ChannelPickerHelper.pick_channels(
-            epochs, channel_levels, channel_picks, logger
-        )
+        ChannelPickerHelper.pick_channels(epochs, channel_levels, channel_picks, logger)
         self.assertEqual(
             epochs.ch_names, ["ch1", "ch2"], "Channels should not be changed."
         )
@@ -57,19 +46,3 @@ class TestHelpers(unittest.TestCase):
         # Test failed channel selection, level higher then 3 should include all
         with self.assertRaises(ValueError):
             ChannelPickerHelper.pick_channels(epochs, 5, [["ch4"]], logger)
-
-    def test_create_epochs(self):
-        epochs = EpochCreatorHelper.create_epochs(
-            self.raw_conc,
-            self.events,
-            self.event_id,
-            tmin=self.tmin,
-            tmax=self.tmax,
-            proj=self.proj,
-            picks=self.picks,
-            baseline=self.baseline,
-            preload=self.preload,
-        )
-
-        # Assert that the returned object is an instance of mne.Epochs
-        self.assertIsInstance(epochs, mne.Epochs)
