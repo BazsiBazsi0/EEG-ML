@@ -4,6 +4,7 @@ from typing import List
 
 
 class LabelHelper:
+    @staticmethod
     def init_arguments(data_path, subject):
         # The imaginary runs for indexing purposes
         runs = [4, 6, 8, 10, 12, 14]
@@ -17,7 +18,7 @@ class LabelHelper:
         sub_folder = os.path.join(data_path, sub_name)
         subject_runs = []
         return runs, sub_folder, sub_name, subject_runs, task2, task4
-
+    @staticmethod
     def label_annotations(
         descriptions: List[str], old_labels: List[str], new_labels: List[str]
     ) -> List[str]:
@@ -36,7 +37,7 @@ class LabelHelper:
             if desc in old_labels:
                 descriptions[i] = new_labels[old_labels.index(desc)]
         return descriptions
-
+    @staticmethod
     def label_epochs(
         self, raw_filt: mne.io.Raw, run: int, task2: List[int], task4: List[int]
     ) -> mne.Epochs:
