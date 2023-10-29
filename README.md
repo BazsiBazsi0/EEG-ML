@@ -78,6 +78,9 @@ Run the main script
 ```
 python3 main.py
 ```
+
+> Note if you want to run it on VSCode, make sure to use the _ms-python.python-2023.8.0_ extension. Testing is currently only supported this way.
+
 ## Results
 
 The use of synthetic data upsampling significantly improved the performance of the machine learning model on the imbalanced EEG Motor Movement/Imagery Dataset. The individual results are in the "Results" folder.
