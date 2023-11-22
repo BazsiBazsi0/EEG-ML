@@ -103,6 +103,6 @@ Future work includes exploring different upsampling techniques and machine learn
 - Demo notebook
 - Classes
   - preprocessing and core logic: WIP
-  - dataset generation DONE
+  - dataset generation implemented
 - Modularity and expandable multi class structure
-  - utils DONE - needs review
+  - utils implemented - currently under revision and testing
