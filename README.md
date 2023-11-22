@@ -7,6 +7,11 @@
 <a href=""><img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white"></a>
 <a href=""><img src="https://img.shields.io/badge/Keras-FF0000?style=for-the-badge&logo=keras&logoColor=white"></a>
 </p>
+<p align="center">
+<a href="https://codecov.io/gh/bkutasi/EEG-ML" > 
+ <img src="https://codecov.io/gh/bkutasi/EEG-ML/graph/badge.svg?token=5ZH3RH6PF9"/> 
+ </a>
+</p>
 
 ## Introduction
 
@@ -36,6 +41,9 @@ The individual results are in the results folder in their respective folder.
 
 
 ## Code Usage
+
+> Note if you want to run it on VSCode, make sure to use the _ms-python.python-2023.8.0_ extension. Testing is currently only supported this way.
+
 For the first time running its gonna take some time to download the raw dataset and generate the filtered data.
 
 To run the code use linux or WSL, and follow these steps:
@@ -44,7 +52,7 @@ To run the code use linux or WSL, and follow these steps:
 
 There are many problems currently with the Tensorflow package, the easiest way running it with GPU acceleration is in a Colab or Kaggle notebook. Currently a demo notebook is on the way, once the code refactoring is finished. If you are lucky and everything is right you can run it in docker (after installing the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)) or in a venv.
 
-# Docker
+### Docker
 1. Clone the repository.
 2. Build the dockerfile.
 ```
@@ -59,7 +67,7 @@ docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace EEG-ML:latest
 python3 main.py
 ```
 
-# Local
+### Local
 Make a virtual environment
 ```
 python3 -m venv env
@@ -79,8 +87,6 @@ Run the main script
 python3 main.py
 ```
 
-> Note if you want to run it on VSCode, make sure to use the _ms-python.python-2023.8.0_ extension. Testing is currently only supported this way.
-
 ## Results
 
 The use of synthetic data upsampling significantly improved the performance of the machine learning model on the imbalanced EEG Motor Movement/Imagery Dataset. The individual results are in the "Results" folder.
@@ -92,7 +98,8 @@ Future work includes exploring different upsampling techniques and machine learn
 ## TODO
 - High percentage testing coverage, coverage report
     - utils test created, basic utils are covered
-    - test coverage report WIP
+    - test coverage report implemented
+    - Goal is to get it above 50% then eventually 90%+
 - Demo notebook
 - Classes
   - preprocessing and core logic: WIP
