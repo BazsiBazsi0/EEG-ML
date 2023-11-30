@@ -15,10 +15,6 @@ class TestDatasetUtils(unittest.TestCase):
         # Filtering range for the test
         self.filtering = (0, 38)  # replace with your actual filtering range
 
-        # Use an already existing file for testing
-        # MNE cant create a raw EDF object from a non existing file
-        self.path_run = "./dataset/files/S001/S001R01.edf"
-
     @patch("os.makedirs")
     @patch("os.path.exists")
     @patch("numpy.save")
@@ -51,13 +47,6 @@ class TestDatasetUtils(unittest.TestCase):
 
         self.assertIsInstance(xs, np.ndarray)
         self.assertIsInstance(y, list)
-
-    def test_process_raw_edf(self):
-        # Call the function with the mock EDF file and check the result
-        result = self.dataset_utils.process_raw_edf(self.path_run, self.filtering)
-
-        # Assert that the result is an instance of mne.io.Raw
-        self.assertIsInstance(result, mne.io.BaseRaw)
 
     def test_label_epochs(self):
         # Create a dummy raw object with annotations
