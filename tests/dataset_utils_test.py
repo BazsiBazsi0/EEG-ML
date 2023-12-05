@@ -17,9 +17,7 @@ class TestDatasetUtils(unittest.TestCase):
 
         # Use an already existing file for testing
         # MNE cant create a raw EDF object from a non existing file
-        self.path_run = "./dataset/files/S001/S001R01.edf"
-        if not os.path.exists(self.path_run):
-            self.path_run = None
+        self.path_run = "./tests/S001R01.edf"
 
     @patch("os.makedirs")
     @patch("os.path.exists")
@@ -41,10 +39,6 @@ class TestDatasetUtils(unittest.TestCase):
             self.fail(f"test_generate failed with {e}")
 
     def test_load_data(self):
-        if self.path_run is None:
-            self.assertTrue(True)
-            return
-
         subject = 1
         data_path = self.dataset_utils.dataset_folder
         filtering = (1, 10)
@@ -58,11 +52,7 @@ class TestDatasetUtils(unittest.TestCase):
         self.assertIsInstance(xs, np.ndarray)
         self.assertIsInstance(y, list)
 
-    def test_process_raw_edf(self):
-        if self.path_run is None:
-            self.assertTrue(True)
-            return
-            
+    def test_process_raw_edf(self):          
         # Call the function with the mock EDF file and check the result
         result = self.dataset_utils.process_raw_edf(self.path_run, self.filtering)
 
