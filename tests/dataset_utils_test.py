@@ -17,7 +17,7 @@ class TestDatasetUtils(unittest.TestCase):
 
         # Use an already existing file for testing
         # MNE cant create a raw EDF object from a non existing file
-        self.path_run = "./tests/S001R01.edf"
+        self.path_run = "./tests/S001/S001R01.edf"
 
     @patch("os.makedirs")
     @patch("os.path.exists")
@@ -40,7 +40,7 @@ class TestDatasetUtils(unittest.TestCase):
 
     def test_load_data(self):
         subject = 1
-        data_path = self.dataset_utils.dataset_folder
+        data_path = "./tests/"
         filtering = (1, 10)
         channel_level = 1
         channel_picks = ["C1..", "C2..", "C3..", "C4..", "C5..", "C6..", "Cz.."]
