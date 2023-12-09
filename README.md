@@ -42,8 +42,6 @@ The individual results are in the results folder in their respective folder.
 
 ## Code Usage
 
-> Note if you want to run it on VSCode, make sure to use the _ms-python.python-2023.8.0_ extension. Testing is currently only supported this way.
-
 For the first time running its gonna take some time to download the raw dataset and generate the filtered data.
 
 To run the code use linux or WSL, and follow these steps:
@@ -106,3 +104,9 @@ Future work includes exploring different upsampling techniques and machine learn
   - dataset generation implemented
 - Modularity and expandable multi class structure
   - utils implemented - currently under revision and testing
+## Notes about testing
+- Due to version differences and overall discrepancy over the years/months with the python test discovery inside vscode, it is recommended to put the following inside your `settings.json` file:
+```json
+"python.experiments.optOutFrom": ["pythonTestAdapter"]
+```
+- The S001 folder is the first subject from the dataset and it is mandatory to test the functionality of the various classes. Unfortunately it increases the size of the repo.
