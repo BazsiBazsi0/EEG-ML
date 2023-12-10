@@ -4,6 +4,7 @@ from unittest.mock import patch, MagicMock
 from utils.dataset_download_utils import Downloader
 import shutil
 import zipfile
+import tempfile
 from io import BytesIO
 
 
@@ -64,3 +65,13 @@ class TestDownloader(unittest.TestCase):
 
         self.assertTrue(os.path.isfile(self.download_path))
         mock_zipcheck.assert_called_once_with(self.download_path)
+
+    @patch("requests.get")
+    @patch("builtins.open", new_callable=unittest.mock.mock_open)
+    @patch("os.path.isfile")
+    def test_download_exception(self, mock_isfile, mock_open, mock_get):
+        mock_isfile.return_value = False
+        mock_get.side_effect = Exception("Test exception")
+        with patch.object(self.downloader.logger, "error") as mock_error:
+            self.downloader.download()
+            mock_error.assert_called_once_with("An error occurred: Test exception")
