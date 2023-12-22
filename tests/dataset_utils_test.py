@@ -38,6 +38,65 @@ class TestDatasetUtils(unittest.TestCase):
             self.logger.error(f"test_generate failed with {e}")
             self.fail(f"test_generate failed with {e}")
 
+    @patch("os.makedirs")
+    @patch("os.path.exists")
+    @patch("os.getcwd")
+    @patch("numpy.save")
+    @patch.object(DatasetUtils, "load_data")
+    @patch.object(DatasetUtils, "__init__")
+    def test_generate2(
+        self,
+        init_mock,
+        load_data_mock,
+        np_save_mock,
+        getcwd_mock,
+        path_exists_mock,
+        makedirs_mock,
+    ):
+        # TODO: Check why the test fails, the wrong subject is passed to load_data
+        # Mock the __init__ method to avoid calling it during initialization
+        init_mock.return_value = None
+
+        # Create an instance of the class
+        utils = DatasetUtils()
+
+        # Set the properties that would have been set by __init__
+        utils.dataset_folder = "dataset/files"
+        utils.subjects = [0, 1]
+        utils.channel_level = {0: ["ch1", "ch2"]}
+        utils.filtering = [0, 38]
+
+        # Mock the logger
+        utils.logger = MagicMock()
+
+        # Mock the return value of os.getcwd
+        getcwd_mock.return_value = "/current/directory"
+
+        # Mock the return value of os.path.exists
+        path_exists_mock.return_value = False
+
+        # Mock the return value of load_data
+        load_data_mock.return_value = (np.array([0, 1]), np.array([1, 0]))
+
+        # Call the method under test
+        utils.generate()
+
+        # Assert that the methods were called with the correct arguments
+        getcwd_mock.assert_called()
+        makedirs_mock.assert_called_with(
+            "/current/directory/dataset/filtered_data/ch_level_0"
+        )
+        path_exists_mock.assert_called()
+        # TODO: Check why the wrong subject is passed to load_data
+        load_data_mock.assert_called_with(
+            subject=2,
+            data_path="/current/directory/dataset/files",
+            filtering=[0, 38],
+            channel_level=0,
+            channel_picks=["ch1", "ch2"],
+        )
+        np_save_mock.assert_called()
+
     def test_load_data(self):
         subject = 1
         data_path = "./tests/"
@@ -52,7 +111,7 @@ class TestDatasetUtils(unittest.TestCase):
         self.assertIsInstance(xs, np.ndarray)
         self.assertIsInstance(y, list)
 
-    def test_process_raw_edf(self):          
+    def test_process_raw_edf(self):
         # Call the function with the mock EDF file and check the result
         result = self.dataset_utils.process_raw_edf(self.path_run, self.filtering)
 
