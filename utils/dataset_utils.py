@@ -23,7 +23,7 @@ class DatasetUtils:
         if filtering is None:
             filtering = [0, 38]
         if subjects is None:
-            subjects = [n for n in np.arange(0, 103) if n not in excluded_pat]
+            subjects = [n for n in np.arange(1, 109) if n not in excluded_pat]
         self.dataset_folder = dataset_folder
         self.subjects = subjects
         self.channel_level = channel_level
@@ -78,7 +78,7 @@ class DatasetUtils:
 
                 try:
                     x, y = self.load_data(
-                        subject=sub + 1,
+                        subject=sub,
                         data_path=data_path,
                         filtering=self.filtering,
                         channel_level=ch_level,
@@ -204,9 +204,14 @@ class DatasetUtils:
             epochs, channel_level, channel_picks, self.logger
         )
         # Constructing the data labels
-        y = [epoch for epoch in epochs][:160]
-        xs = np.array(epochs)[:160, :, :]
-        return xs, y
+        y = list()
+        for index in range(len(epochs)):
+            y.append(epochs[index]._name)
+
+        # y = [epochs[index]._name for index in range(len(epochs))]
+        xs = np.array(epochs)
+        xs = xs[:160, :, :]
+        return xs, y[:160]
 
     def label_epochs(
         self, raw_filt: mne.io.Raw, run: int, task2: List[int], task4: List[int]
@@ -256,4 +261,7 @@ class DatasetUtils:
             raw_filt.annotations.description = LabelHelper.label_annotations(
                 raw_filt.annotations.description, ["T0", "T1", "T2"], ["B", "LR", "F"]
             )
+        self.logger.info(
+            f"Raw annotation modified descriptions: \n{raw_filt.annotations.description}"
+        )
         return raw_filt
