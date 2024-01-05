@@ -42,7 +42,7 @@ class NeuralNets:
             )
 
             # train and evaluate the model
-            model = nn.NeuralNets.FullyConvCNN()
+            model = nn.NeuralNets.FullyConvCNN(electrodes=X.shape[2])
             history = model.fit(
                 X_train, y_train, validation_data=(X_val, y_val), epochs=10, verbose=0
             )
@@ -209,11 +209,11 @@ class NeuralNets:
         return model
 
     @staticmethod
-    def FullyConvCNN():
+    def FullyConvCNN(electrodes: int):
         loss = tf.keras.losses.categorical_crossentropy
         optimizer = tf.keras.optimizers.Adam()
         drop_rate = 0.5
-        inputs = tf.keras.Input(shape=(41, 641, 1))
+        inputs = tf.keras.Input(shape=(electrodes, 641, 1))
 
         # First Convolutional Layer
         x = tf.keras.layers.Conv2D(32, (3, 3), padding="same", activation="leaky_relu")(
