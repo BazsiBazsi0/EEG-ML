@@ -23,19 +23,16 @@ if __name__ == "__main__":
     dataset_utils = DatasetUtils()
 
     # Generate the dataset from the data we have downloaded
-    # TODO: Add optional arguments for regeneration specific patient
     dataset_utils.generate()
 
-    # Preprocessing done
-
-    # Process the data and load it
+    # Data loading
     # TODO: Break apart the loader to a processor and a loader
     x, y, x_no_smote, y_no_smote = fileloader.FileLoader.load_saved_files()
     print("Shape of x: ", np.shape(x))
     print("Instances of classes before SMOTE: ", y_no_smote.sum(axis=1).sum(axis=0))
     print("Instances of classes after SMOTE: ", y.sum(axis=1).sum(axis=0))
 
-    # TODO: Fix hardcoded values, make it dynamic, add to config, and handle data dynamically
+    # Execute leave one out validation with a predefined model
     history, model, acc, avgAcc = nn.NeuralNets.loo(x, y)
 
     # model = nn.NeuralNets.one_d_cnn_multi()
