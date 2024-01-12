@@ -89,6 +89,8 @@ python3 main.py
 
 The use of synthetic data upsampling significantly improved the performance of the machine learning model on the imbalanced EEG Motor Movement/Imagery Dataset. The individual results are in the "Results" folder.
 
+*Important Note: after I validated my results rigorously in 2023 and 2024 I discovered a severe error in the data filtration process which resulted the FCN-SMOTE combination to have inflated accuracy scores across all levels. Full post mortem to be released later.*
+
 ## Future Work
 
 Future work includes exploring different upsampling techniques and machine learning models to further improve the performance. Currently I'm working on getting things into a better shape including visuals. Docker deployment and a simple showcase jupyter notebook is also on the todo list.
