@@ -64,13 +64,13 @@ class DatasetUtils:
                     os.makedirs(save_path)
                     self.logger.info(f"Directory {save_path} created.")
                 except FileExistsError:
-                    self.logger.warning(f"Directory {save_path} already exists.")
+                    self.logger.info(f"Directory {save_path} already exists.")
 
                 x_file_path = os.path.join(save_path, "x_sub_" + str(sub) + ".npy")
                 y_file_path = os.path.join(save_path, "y_sub_" + str(sub) + ".npy")
 
                 if os.path.exists(x_file_path) and os.path.exists(y_file_path):
-                    self.logger.warning(
+                    self.logger.info(
                         f"Files for subject {sub} at channel level "
                         f"{ch_level} already exist."
                     )
