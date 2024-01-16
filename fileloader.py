@@ -76,7 +76,7 @@ class FileLoader:
 
         x_no_smote = x_no_smote_pre.reshape(
             patients,
-            x_no_smote_pre.shape[0] // patients,  # 12320 / 91 = 135???
+            x_no_smote_pre.shape[0] // patients,
             x_no_smote_pre.shape[1],
             x_no_smote_pre.shape[2],
         ).astype(np.float32)
