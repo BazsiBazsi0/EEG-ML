@@ -2,6 +2,7 @@ import numpy as np
 from imblearn.over_sampling import SMOTE
 from sklearn.preprocessing import minmax_scale
 from tensorflow.keras.utils import to_categorical
+from sklearn.preprocessing import StandardScaler
 
 
 class FileProcessor:
@@ -49,8 +50,15 @@ class FileProcessor:
             np.float16
         )
 
+        # Normalize the data
+        # TODO: Docu
+        scaler = StandardScaler()
+        x_normalized = scaler.fit_transform(x_reshaped)
+
         # Minmax scaling
-        x_scaled = minmax_scale(x_reshaped, axis=1).astype(np.float16)
+        x_scaled = minmax_scale(x_normalized, axis=1, feature_range=(-1, 1)).astype(
+            np.float16
+        )
 
         # One_hot encoding
         y_one_hot = FileProcessor.to_one_hot(y)
