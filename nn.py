@@ -1,14 +1,22 @@
+import time
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     roc_auc_score,
     roc_curve,
 )
+from sklearn.model_selection import KFold, train_test_split
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 import nn
+from neuralnets.OneCycleScheduler import OneCycleScheduler
+from neuralnets.FCNN import FCNN
+from neuralnets.GradAugAdam import GradAugAdam
+from neuralnets.EarlyStoppingLearningRateSpeedup import EarlyStoppingLearningRateSpeedup
 
 
 class NeuralNets:
@@ -17,11 +25,17 @@ class NeuralNets:
         acc = []
         models = []
         # perform LOO cross-validation
-        num_batches = X.shape[0]
+        num_batches = 10
+        batch_size = X.shape[0] // num_batches
+
         for i in range(num_batches):
+            # calculate the start and end indices for the current batch
+            start_idx = i * batch_size
+            end_idx = start_idx + batch_size
+
             # create the training and validation sets
-            X_train = np.concatenate([X[:i], X[i + 1 :]])
-            y_train = np.concatenate([y[:i], y[i + 1 :]])
+            X_train = np.concatenate([X[:start_idx], X[end_idx:]])
+            y_train = np.concatenate([y[:start_idx], y[end_idx:]])
             X_train = X_train.reshape(
                 (
                     int(X_train.shape[0] * X_train.shape[1]),
@@ -32,8 +46,9 @@ class NeuralNets:
             y_train = y_train.reshape(
                 (int(y_train.shape[0] * y_train.shape[1]), y_train.shape[2])
             )
-            X_val = X[i : i + 1]
-            y_val = y[i : i + 1]
+
+            X_val = X[start_idx:end_idx]
+            y_val = y[start_idx:end_idx]
             X_val = X_val.reshape(
                 (int(X_val.shape[0] * X_val.shape[1]), X_val.shape[2], X_val.shape[3])
             )
@@ -52,10 +67,157 @@ class NeuralNets:
             acc.append(accuracy)
             models.append(model)
             nn.NeuralNets.save_accuracy_curves(
-                history, 10, "1DCNN" + str(i) + "_level1.png"
+                history, 10, f"{model.name}_fold_{i}_level_0.png"
             )
 
         return history, models, acc, np.average(acc)
+
+    @staticmethod
+    def k_fold_validation(X, y, k=10):
+        acc = []
+        models = []
+        kfold = KFold(n_splits=k, shuffle=True)
+
+        for train_index, val_index in kfold.split(X):
+            X_train, X_val = X[train_index], X[val_index]
+            y_train, y_val = y[train_index], y[val_index]
+
+            # reshape the data
+            X_train = X_train.reshape(
+                (
+                    int(X_train.shape[0] * X_train.shape[1]),
+                    X_train.shape[2],
+                    X_train.shape[3],
+                )
+            )
+            y_train = y_train.reshape(
+                (int(y_train.shape[0] * y_train.shape[1]), y_train.shape[2])
+            )
+
+            X_val = X_val.reshape(
+                (int(X_val.shape[0] * X_val.shape[1]), X_val.shape[2], X_val.shape[3])
+            )
+            y_val = y_val.reshape(
+                (int(y_val.shape[0] * y_val.shape[1]), y_val.shape[2])
+            )
+
+            # train and evaluate the model
+            model = nn.NeuralNets.FullyConvCNN(electrodes=X.shape[2])
+            # model = FCNN(electrodes=X.shape[2])
+            model.compile(
+                loss=tf.keras.losses.categorical_crossentropy,
+                optimizer=GradAugAdam(learning_rate=0.01, noise_stddev=0.01),
+                metrics=["accuracy"],
+            )
+            model._name = "FCNN"
+
+            # TODO: docu
+            # create a learning rate scheduler, pretty aggressive, avoid plateus
+            reduce_lr = ReduceLROnPlateau(
+                monitor="val_loss",
+                factor=0.1,
+                patience=10,
+                min_lr=0.000001,
+            )
+            early_stopping = EarlyStopping(monitor="val_loss", patience=20)
+            early_stopping_speedup = EarlyStoppingLearningRateSpeedup(patience=10)
+
+            batch_size = 32
+            epochs = 50
+
+            scheduler = OneCycleScheduler(
+                max_lr=0.01,
+                steps_per_epoch=len(X_train) // batch_size,
+                epochs=epochs,
+                verbose=1,
+            )
+
+            history = model.fit(
+                X_train,
+                y_train,
+                validation_data=(X_val, y_val),
+                epochs=epochs,
+                batch_size=batch_size,
+                callbacks=[scheduler],
+                verbose=1,
+            )
+            loss, accuracy = model.evaluate(X_val, y_val, verbose=0)
+            print(f"Fold: {len(models)}, loss: {loss}, accuracy: {accuracy}")
+
+            acc.append(accuracy)
+            models.append(model)
+            nn.NeuralNets.save_accuracy_curves(
+                history, f"{model.name}_fold_{len(models)-1}_level_0.png"
+            )
+
+        return history, models, acc, np.average(acc)
+
+    @staticmethod
+    def train_model(X, y, epochs=100, batch_size=32):
+        # split the data into training and validation sets
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1)
+
+        # reshape the data
+        X_train = X_train.reshape(
+            (
+                int(X_train.shape[0] * X_train.shape[1]),
+                X_train.shape[2],
+                X_train.shape[3],
+            )
+        )
+        y_train = y_train.reshape(
+            (int(y_train.shape[0] * y_train.shape[1]), y_train.shape[2])
+        )
+
+        X_val = X_val.reshape(
+            (int(X_val.shape[0] * X_val.shape[1]), X_val.shape[2], X_val.shape[3])
+        )
+        y_val = y_val.reshape((int(y_val.shape[0] * y_val.shape[1]), y_val.shape[2]))
+
+        # train the model
+        model = nn.NeuralNets.FullyConvCNN(electrodes=X.shape[2])
+        # create a learning rate scheduler
+        reduce_lr = ReduceLROnPlateau(
+            monitor="val_loss", factor=0.1, patience=5, min_lr=0.0001
+        )
+
+        history = model.fit(
+            X_train,
+            y_train,
+            validation_data=(X_val, y_val),
+            epochs=epochs,
+            batch_size=batch_size,
+            callbacks=[reduce_lr],
+            verbose=1,
+        )
+        loss, accuracy = model.evaluate(X_val, y_val, verbose=0)
+        print(f"Validation Loss: {loss}, Validation Accuracy: {accuracy}")
+
+        nn.NeuralNets.save_accuracy_curves(history, f"{model.name}_level_0.png")
+
+        return model, history, accuracy
+
+    @staticmethod
+    def benchmark(X, y, epochs=10, batch_size=32):
+        # start the timer
+        start_time = time.time()
+
+        # train the model
+        model, history, accuracy = nn.NeuralNets.train_model(
+            X, y, epochs=epochs, batch_size=batch_size
+        )
+
+        # stop the timer
+        end_time = time.time()
+
+        # calculate the elapsed time
+        elapsed_time = end_time - start_time
+
+        print(
+            f"Time taken to train the model for {epochs} epochs: {elapsed_time} seconds"
+        )
+
+        return elapsed_time
 
     @staticmethod
     def generator_processor(model, x, y):
@@ -206,57 +368,50 @@ class NeuralNets:
 
         model = tf.keras.Model(inputs, out)
         model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
+        model._name = "1DCNN"
         return model
 
     @staticmethod
     def FullyConvCNN(electrodes: int):
-        loss = tf.keras.losses.categorical_crossentropy
-        optimizer = tf.keras.optimizers.Adam()
         drop_rate = 0.5
         inputs = tf.keras.Input(shape=(electrodes, 641, 1))
 
         # First Convolutional Layer
-        x = tf.keras.layers.Conv2D(32, (3, 3), padding="same", activation="leaky_relu")(
-            inputs
-        )
+        x = tf.keras.layers.Conv2D(32, (3, 3), padding="same")(inputs)
+        x = tf.keras.layers.LeakyReLU()(x)
         x = tf.keras.layers.Dropout(drop_rate)(x)
         # Second Convolutional Layer
-        x = tf.keras.layers.Conv2D(32, (3, 3), padding="same", activation="leaky_relu")(
-            x
-        )
+        x = tf.keras.layers.Conv2D(32, (3, 3), padding="same")(x)
+        x = tf.keras.layers.LeakyReLU()(x)
         x = tf.keras.layers.BatchNormalization()(x)
         # Third Convolutional Layer
-        x = tf.keras.layers.Conv2D(64, (3, 3), padding="same", activation="leaky_relu")(
-            x
-        )
+        x = tf.keras.layers.Conv2D(64, (3, 3), padding="same")(x)
+        x = tf.keras.layers.LeakyReLU()(x)
         x = tf.keras.layers.Dropout(drop_rate)(x)
         # First pooling layer
-        x = tf.keras.layers.Conv2D(
-            64, (3, 3), padding="valid", strides=(2, 2), activation="leaky_relu"
-        )(x)
+        x = tf.keras.layers.Conv2D(64, (3, 3), padding="valid", strides=(2, 2))(x)
+        x = tf.keras.layers.LeakyReLU()(x)
         # Fourth Convolutional Layer
-        x = tf.keras.layers.Conv2D(64, (3, 3), padding="SAME", activation="leaky_relu")(
-            x
-        )
+        x = tf.keras.layers.Conv2D(64, (3, 3), padding="same")(x)
+        x = tf.keras.layers.LeakyReLU()(x)
         x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.layers.Dropout(drop_rate)(x)
         # Fifth Convolutional Layer
-        x = tf.keras.layers.Conv2D(64, (3, 3), padding="SAME", activation="leaky_relu")(
-            x
-        )
+        x = tf.keras.layers.Conv2D(64, (3, 3), padding="same")(x)
+        x = tf.keras.layers.LeakyReLU()(x)
         x = tf.keras.layers.BatchNormalization()(x)
 
         # Sixth Convolutional Layer
-        x = tf.keras.layers.Conv2D(
-            filters=128, kernel_size=(3, 3), padding="SAME", activation="leaky_relu"
-        )(x)
+        x = tf.keras.layers.Conv2D(filters=128, kernel_size=(3, 3), padding="same")(x)
+        x = tf.keras.layers.LeakyReLU()(x)
         x = tf.keras.layers.Dropout(drop_rate)(x)
 
         # Flatten layer
         x = tf.keras.layers.Flatten()(x)
 
         # First Fully Connected Layer
-        dense1 = tf.keras.layers.Dense(64, activation="leaky_relu")(x)
+        dense1 = tf.keras.layers.Dense(64)(x)
+        dense1 = tf.keras.layers.LeakyReLU()(dense1)
         batch_norm1 = tf.keras.layers.BatchNormalization()(dense1)
         dropout1 = tf.keras.layers.Dropout(drop_rate)(batch_norm1)
 
@@ -265,8 +420,6 @@ class NeuralNets:
         out = dense2
 
         model = tf.keras.Model(inputs, out)
-        model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
-
         return model
 
     # FFT processor which takes data before smote, applies FFT on it, then SMOTE on the frequency domain, then applies IFFT
@@ -361,13 +514,13 @@ class NeuralNets:
             )
 
     @staticmethod
-    def save_accuracy_curves(history, number_of_epochs, filename):
+    def save_accuracy_curves(history, filename):
         acc = history.history["accuracy"]
         val_acc = history.history["val_accuracy"]
         loss = history.history["loss"]
         val_loss = history.history["val_loss"]
 
-        epochs_range = range(number_of_epochs)
+        epochs_range = range(len(acc))
 
         fig = plt.figure(figsize=(12, 6))
 
