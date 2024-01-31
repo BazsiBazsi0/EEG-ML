@@ -2,8 +2,8 @@ import os
 import numpy as np
 import mne
 from typing import List, Tuple
-from utils.config import excluded_pat
-from utils.config import channel_inclusion_lvl
+from utils.config import excluded
+from utils.config import ch_level
 from utils.logging_utils import Logger
 from utils.helpers.channel_picker_helper import ChannelPickerHelper
 from utils.helpers.epoch_creator_helper import EpochCreatorHelper
@@ -17,13 +17,13 @@ class DatasetUtils:
         self,
         dataset_folder: str = "dataset/files",
         subjects=None,
-        channel_level: list = channel_inclusion_lvl,
+        channel_level: list = ch_level,
         filtering=None,
     ):
         if filtering is None:
             filtering = [0, 38]
         if subjects is None:
-            subjects = [n for n in np.arange(1, 109) if n not in excluded_pat]
+            subjects = [n for n in np.arange(1, 109) if n not in excluded]
         self.dataset_folder = dataset_folder
         self.subjects = subjects
         self.channel_level = channel_level
