@@ -5,9 +5,13 @@ from tensorflow.keras import backend as K
 
 class EarlyStoppingLearningRateSpeedup(callbacks.Callback):
     """Custom callback for early stopping with learning rate speedup.
+    Usage example:
+        scheduler = OneCycleScheduler(max_lr=0.01, steps_per_epoch=len(X_train) // batch_size, epochs=epochs)
+        model.fit(X_train, y_train, epochs=epochs, callbacks=[scheduler])
+    Note: If there is anything else that can manipulate the learning rate, it should either merged with this or dropped.
 
     Args:
-        patience (int): Number of epochs with no improvement after which training will be stopped.
+        patience (int): Number of epochs with no improvement after which training will decrease the learning rate then stop.
     """
 
     def __init__(self, patience: int = 20):

@@ -44,25 +44,8 @@ class OneCycleScheduler(tf.keras.callbacks.Callback):
         self.wait = 0
         self.last_round = 0
         self.adaptive_stopping = adaptive_stopping
-
-    def on_train_batch_begin(self, batch, logs=None):
-        """
-        Callback function called at the beginning of each training batch.
-
-        Args:
-            batch (int): The current batch index.
-            logs (dict, optional): Dictionary containing the training metrics. Defaults to None.
-        """
-        if self.step <= self.total_steps * self.pct_start:
-            scale = self.step / (self.total_steps * self.pct_start)
-        else:
-            scale = (self.total_steps - self.step) / (
-                self.total_steps * (1 - self.pct_start)
-            )
-
-        lr = self.max_lr * (1 + scale * (self.div_factor - 1)) / self.div_factor
-        tf.keras.backend.set_value(self.model.optimizer.lr, lr)
-        self.step += 1
+        self.pct_start_steps = self.total_steps * pct_start
+        self.pct_end_steps = self.total_steps * (1 - pct_start)
 
     def on_epoch_end(self, epoch, logs=None):
         lr = float(tf.keras.backend.get_value(self.model.optimizer.lr))
@@ -97,3 +80,20 @@ class OneCycleScheduler(tf.keras.callbacks.Callback):
                         )
                         self.model.stop_training = True
                         self.model.set_weights(self.best_weights)
+
+    def on_train_batch_begin(self, batch, logs=None):
+        """
+        Callback function called at the beginning of each training batch.
+
+        Args:
+            batch (int): The current batch index.
+            logs (dict, optional): Dictionary containing the training metrics. Defaults to None.
+        """
+        if self.step <= self.pct_start_steps:
+            scale = self.step / self.pct_start_steps
+        else:
+            scale = (self.total_steps - self.step) / self.pct_end_steps
+
+        lr = self.max_lr * (1 + scale * (self.div_factor - 1)) / self.div_factor
+        self.model.optimizer.lr = lr
+        self.step += 1

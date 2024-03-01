@@ -1,14 +1,23 @@
 import os
 import numpy as np
 import fileloader
-import nn
+import NeuralNets
+import tensorflow as tf
+import utils.config as config
 from utils.dataset_download_utils import Downloader
 from utils.dataset_utils import DatasetUtils
+from utils import logging_utils
+from neuralnets.eval.ModelEvaluator import ModelEvaluator
+from neuralnets.plotters.DataVisualizer import DataVisualizer
+from fileprocessor import FileProcessor
 
 if __name__ == "__main__":
 
     # Only use the first available gpu/device
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+    # Logging setup
+    logger = logging_utils.Logger(__name__)
 
     # Initialize the download class
     downloader = Downloader(
@@ -25,30 +34,38 @@ if __name__ == "__main__":
     # Generate the dataset from the data we have downloaded
     dataset_utils.generate()
 
-    # Data loading
-    # TODO: Break apart the loader to a processor and a loader
-    x, y, x_no_smote, y_no_smote = fileloader.FileLoader.load_saved_files()
-    # TODO: Proper logging
-    print("Shape of x: ", np.shape(x))
-    print("Instances of classes before SMOTE: ", y_no_smote.sum(axis=1).sum(axis=0))
-    print("Instances of classes after SMOTE: ", y.sum(axis=1).sum(axis=0))
+    # Data loading, load_level parameter is the level of electrodes to be used(0: lowest, 3: highest)
+    load_level = 0
+
+    # Loading the saved files
+    x, y = fileloader.FileLoader.load_saved_files(load_level)
+
+    # Pre-processing the variables
+    FileProcessor = FileProcessor(x, y)
+    x, y, x_smote, y_smote, x_val, y_val = FileProcessor.preprocessor()
 
     # Data loading and preprocessing done, time to train the model
-    # Execute leave one out(k_fold n=10) validation with a predefined model
     # TODO: Document kfold, Plateou LR reduction(0.0001 and try later 0.00001) and later OneCycleScheduler
-    history, model, acc, avgAcc = nn.NeuralNets.k_fold_validation(x, y)
+    histories, models = NeuralNets.NeuralNets.k_fold_validation(
+        x,
+        y,
+        k=4,
+        epochs=50,
+        model_name="OneDCNN",
+        load_level=load_level,
+        electrodes=len(config.ch_level[load_level]),
+    )
 
-    # TODO: Proper logging
-    # Accuracy saving
-    with open("avg accuracy.txt", "a") as f:
-        f.write(str(avgAcc) + "\n")
-
-    print("Final avg accuracy:", avgAcc)
-
-    # x, y, x_no_smote, y_no_smote = fileloader.FileLoader.load_saved_files()
-    # nn.NeuralNets.metrics_generation(model, x_no_smote, y_no_smote, "1DCNN")
-    # nn.NeuralNets.plot_roc_curve(model, x_no_smote, y_no_smote, "1DCNN")
-
-    # Alternate metrics generation
-    """nn.NeuralNets.metrics_generation(models['FCN'], x_no_smote, y_no_smote)
-    nn.NeuralNets.plot_roc_curve(models['FCN'], x_no_smote, y_no_smote, "FCN.png")"""
+    """
+    models = tf.keras.models.load_model(
+        "Results/FCNN_ch_level_0/FCNN_ch_level_0_model_0.keras"
+    )
+    """
+    ModelEvaluator.evaluate(
+        models,
+        histories,
+        x_val,
+        y_val,
+        ["save", "curves", "metrics", "roc_curve"],
+        results_dir="Results",
+    )
