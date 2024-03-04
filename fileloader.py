@@ -1,6 +1,5 @@
 import numpy as np
 import config
-from fileprocessor import FileProcessor
 from typing import List
 import os
 
