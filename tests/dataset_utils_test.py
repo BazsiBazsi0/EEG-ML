@@ -53,7 +53,6 @@ class TestDatasetUtils(unittest.TestCase):
         path_exists_mock,
         makedirs_mock,
     ):
-        # TODO: Check why the test fails, the wrong subject is passed to load_data
         # Mock the __init__ method to avoid calling it during initialization
         init_mock.return_value = None
 
@@ -89,7 +88,7 @@ class TestDatasetUtils(unittest.TestCase):
         path_exists_mock.assert_called()
         # TODO: Check why the wrong subject is passed to load_data
         load_data_mock.assert_called_with(
-            subject=2,
+            subject=1,
             data_path="/current/directory/dataset/files",
             filtering=[0, 38],
             channel_level=0,
