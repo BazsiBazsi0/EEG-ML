@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-from sklearn.preprocessing import StandardScaler, minmax_scale
 from fileprocessor import FileProcessor
 
 
