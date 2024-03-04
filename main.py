@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import fileloader
-import NeuralNets
+import modeltrainer
 import tensorflow as tf
 import utils.config as config
 from utils.dataset_download_utils import Downloader
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # Data loading and preprocessing done, time to train the model
     # TODO: Document kfold, Plateou LR reduction(0.0001 and try later 0.00001) and later OneCycleScheduler
-    histories, models = NeuralNets.NeuralNets.k_fold_validation(
+    histories, models = modeltrainer.NeuralNets.k_fold_validation(
         x,
         y,
         k=4,

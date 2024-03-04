@@ -5,13 +5,13 @@ import keras_tuner
 import gc
 from sklearn.model_selection import KFold, train_test_split
 from typing import List
-import NeuralNets
+import modeltrainer
 from neuralnets.models.fcnnmodel import FCNNModel
 from neuralnets.models.onedcnn_functional import OneDCNNModel
 from neuralnets.training_utils.OneCycleScheduler import OneCycleScheduler
 
 
-class NeuralNets:
+class modeltrainer:
     # TODO: Testing and fix the ci/cd for the tests on github actions
     # https://theaisummer.com/unit-test-deep-learning/
     @staticmethod
@@ -93,7 +93,7 @@ class NeuralNets:
         start_time = time.time()
 
         # train the model
-        model, history, accuracy = NeuralNets.NeuralNets.train_model(
+        model, history, accuracy = modeltrainer.NeuralNets.train_model(
             X, y, epochs=epochs, batch_size=batch_size
         )
 
