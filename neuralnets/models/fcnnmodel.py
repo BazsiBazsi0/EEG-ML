@@ -154,10 +154,3 @@ class FCNNModel(tf.keras.Model):
         )
 
         return self.history
-
-    def save_model_summary(self, filepath):
-        with open(filepath, "w") as f:
-            # Redirect the output of model.summary() to the file
-            tf.keras.Model.summary(
-                self, line_length=120, print_fn=lambda x: f.write(x + "\n")
-            )
