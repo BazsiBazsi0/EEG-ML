@@ -1,17 +1,15 @@
 import time
+import gc
 import numpy as np
 from tensorflow.keras import backend as K  # type: ignore
-import keras_tuner
-import gc
-from sklearn.model_selection import KFold, train_test_split
-from typing import List
-import modeltrainer
+from sklearn.model_selection import KFold
 from neuralnets.models.fcnnmodel import FCNNModel
 from neuralnets.models.onedcnn_functional import OneDCNNModel
 from neuralnets.training_utils.OneCycleScheduler import OneCycleScheduler
+from typing import List
 
 
-class modeltrainer:
+class ModelTrainer:
     # TODO: Testing and fix the ci/cd for the tests on github actions
     # https://theaisummer.com/unit-test-deep-learning/
     @staticmethod
@@ -22,7 +20,7 @@ class modeltrainer:
         epochs: int = 50,
         model_name: str = "",
         load_level: int = 0,
-        electrodes: int = 0,
+        electrodes: int = 7,
         shuffle: bool = True,
     ):
         """
@@ -32,7 +30,7 @@ class modeltrainer:
         models: List[object] = []
         histories: List[object] = []
 
-        kfold = KFold(n_splits=k, shuffle=True)
+        kfold = KFold(n_splits=k, shuffle=shuffle)
         # Define a dictionary that maps model names to classes
         model_classes = {
             "FCNN": FCNNModel,
@@ -88,28 +86,6 @@ class modeltrainer:
         return histories, models
 
     @staticmethod
-    def benchmark(X, y, epochs=10, batch_size=32):
-        # start the timer
-        start_time = time.time()
-
-        # train the model
-        model, history, accuracy = modeltrainer.NeuralNets.train_model(
-            X, y, epochs=epochs, batch_size=batch_size
-        )
-
-        # stop the timer
-        end_time = time.time()
-
-        # calculate the elapsed time
-        elapsed_time = end_time - start_time
-
-        print(
-            f"Time taken to train the model for {epochs} epochs: {elapsed_time} seconds"
-        )
-
-        return elapsed_time
-
-    @staticmethod
     def benchmark_prediction(model, X, batch_size=32):
         # start the timer
         start_time = time.time()
@@ -137,59 +113,3 @@ class modeltrainer:
             print(f"Class {unique_class} is predicted {count} times")
 
         return predictions, elapsed_time_ms
-
-    @staticmethod
-    def tuner(
-        X_train,
-        y_train,
-        X_val,
-        y_val,
-        load_level: int = 0,
-        electrodes: int = 0,
-    ):
-        """
-        A tuner method that uses the keras tuner to search for the best hyperparameters for the model.
-        Example usage:
-        nn.NeuralNets.tuner(
-            x,
-            y,
-            x_val,
-            y_val,
-            load_level=load_level,
-            electrodes=len(config.ch_level[load_level]),
-        )
-        """
-        epochs = 25
-        batch_size = 32
-        scheduler = OneCycleScheduler(
-            max_lr=0.0001,
-            steps_per_epoch=len(X_train) // batch_size,
-            epochs=epochs,
-            verbose=1,
-        )
-        tuner = keras_tuner.tuners.RandomSearch(
-            lambda hp: OneDCNNModel.create_and_compile_sequential_tune(
-                hp, load_level, electrodes
-            ),
-            objective="val_accuracy",
-            max_trials=100,
-            directory="my_dir",
-            project_name="OneDCNN_F",
-        )
-
-        tuner.search_space_summary()
-
-        tuner.search(
-            X_train,
-            y_train,
-            epochs=epochs,
-            batch_size=batch_size,
-            validation_data=(X_val, y_val),
-            callbacks=[scheduler],
-        )
-
-        best_model = tuner.get_best_models(num_models=1)[0]
-
-        best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[0]
-
-        print(best_hyperparameters.values)
