@@ -5,7 +5,7 @@ import logging
 class Logger:
     def __init__(self, name):
         self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.WARNING)
+        self.logger.setLevel(logging.DEBUG)
 
         formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
