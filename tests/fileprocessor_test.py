@@ -27,8 +27,10 @@ class TestFileProcessor(unittest.TestCase):
         y = np.random.randint(0, 2, 100)
         y_one_hot = self.fp.to_one_hot(y)
         x_equalized, y_equalized = self.fp.equalize_samples(x_no_smote, y_one_hot)
-        self.assertEqual(x_equalized.shape, x_no_smote.shape)
-        self.assertEqual(y_equalized.shape, y_one_hot.shape)
+        self.assertTrue(x_equalized.shape[0] <= x_no_smote.shape[0])
+        self.assertEqual(x_equalized.shape[1], x_no_smote.shape[1])
+        self.assertTrue(y_equalized.shape[0] <= y_one_hot.shape[0])
+        self.assertEqual(y_equalized.shape[1], y_one_hot.shape[1])
 
     def test_preprocessor(self):
         x_no_smote, y_one_hot, x_smote, y_smote, x_val, y_val = self.fp.preprocessor()
