@@ -1,5 +1,5 @@
 from kerastuner.tuners import RandomSearch
-from neuralnets.training_utils.OneCycleScheduler import OneCycleScheduler
+from neuralnets.training_utils.one_cycle_sched import OneCycleScheduler
 from neuralnets.models.onedcnn_functional import OneDCNNModel
 
 
