@@ -13,8 +13,9 @@ class TestGradAugAdam(unittest.TestCase):
 
     def test_get_gradients(self) -> None:
         var = tf.Variable(1.0)
-        loss = tf.square(var - 0.0)
-        grads = self.optimizer.get_gradients(loss, [var])
+        with tf.GradientTape() as tape:
+            loss = tf.square(var - 0.0)
+        grads = tape.gradient(loss, [var])
 
         # Check that the gradient is not None
         self.assertIsNotNone(grads[0])
