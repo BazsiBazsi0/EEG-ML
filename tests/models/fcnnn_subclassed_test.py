@@ -1,6 +1,6 @@
 import unittest
 import tensorflow as tf
-from neuralnets.models.fcnnmodel import FCNNModel
+from neuralnets.models.fcnnmodel_subclassed import FCNNModel
 
 
 class TestFCNNModel(unittest.TestCase):

@@ -3,7 +3,7 @@ import gc
 import numpy as np
 from tensorflow.keras import backend as K  # type: ignore
 from sklearn.model_selection import KFold
-from neuralnets.models.fcnnmodel import FCNNModel
+from neuralnets.models.fcnnmodel_functional import FCNNModel
 from neuralnets.models.onedcnn_functional import OneDCNNModel
 from neuralnets.training_utils.OneCycleScheduler import OneCycleScheduler
 from typing import List

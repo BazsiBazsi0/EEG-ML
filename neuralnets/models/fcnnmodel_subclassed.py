@@ -40,7 +40,7 @@ class FCNNModel(tf.keras.Model):
         self.leaky_relu8 = tf.keras.layers.LeakyReLU()
         self.batch_norm4 = tf.keras.layers.BatchNormalization()
         self.dropout5 = tf.keras.layers.Dropout(self.drop_rate)
-        self.dense2 = tf.keras.layers.Dense(4, activation="softmax")
+        self.dense2 = tf.keras.layers.Dense(5, activation="softmax")
 
     def call(self, inputs: tf.Tensor) -> tf.Tensor:
         """
