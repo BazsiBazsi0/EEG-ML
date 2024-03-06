@@ -21,7 +21,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        python -m coverage run --source=. --omit=./tests/* -m unittest discover -s tests -p '*_test.py'
+        python -m coverage run --source=. --omit=./tests/* -m unittest discover -s tests -p '*_test.py' -v
         python -m coverage xml
 
     - name: Upload coverage to Codecov
