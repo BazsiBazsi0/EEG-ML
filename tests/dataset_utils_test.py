@@ -1,7 +1,6 @@
 import numpy as np
 import mne
 import unittest
-import os
 from unittest.mock import patch, MagicMock
 from utils.dataset_utils import DatasetUtils
 from utils.logging_utils import Logger

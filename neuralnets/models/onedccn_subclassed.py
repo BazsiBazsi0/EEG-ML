@@ -1,5 +1,5 @@
 import tensorflow as tf
-from neuralnets.training_utils.GradAugAdam import GradAugAdam
+from neuralnets.training_utils.grad_aug_adam import GradAugAdam
 from neuralnets.training_utils.OneCycleScheduler import OneCycleScheduler
 
 

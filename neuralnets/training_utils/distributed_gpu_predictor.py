@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from neuralnets.training_utils.GradAugAdam import GradAugAdam
+from neuralnets.training_utils.grad_aug_adam import GradAugAdam
 
 
 class DoublePredictor:

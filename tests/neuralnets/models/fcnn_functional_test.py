@@ -1,7 +1,7 @@
 import unittest
 import tensorflow as tf
 from neuralnets.models.fcnnmodel_functional import FCNNModel
-from neuralnets.training_utils.GradAugAdam import GradAugAdam
+from neuralnets.training_utils.grad_aug_adam import GradAugAdam
 
 
 class TestFCNNModel(unittest.TestCase):

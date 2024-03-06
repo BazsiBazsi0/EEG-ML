@@ -1,5 +1,5 @@
 from tensorflow.keras import Model
-from neuralnets.training_utils.GradAugAdam import GradAugAdam
+from neuralnets.training_utils.grad_aug_adam import GradAugAdam
 from tensorflow.keras.layers import (
     Input,
     Conv2D,
