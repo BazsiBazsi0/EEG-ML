@@ -1,4 +1,5 @@
 import unittest
+import tensorflow as tf
 from tensorflow.keras import models, layers, optimizers
 import numpy as np
 from neuralnets.training_utils.one_cycle_sched import OneCycleScheduler
@@ -19,7 +20,6 @@ class TestOneCycleScheduler(unittest.TestCase):
             pct_start=0.3,
             verbose=0,
             patience=10,
-            adaptive_stopping=False,
         )
         self.scheduler.model = self.model
 
@@ -29,7 +29,6 @@ class TestOneCycleScheduler(unittest.TestCase):
         self.assertEqual(self.scheduler.step, 0)
         self.assertEqual(self.scheduler.verbose, 0)
         self.assertEqual(self.scheduler.patience, 10)
-        self.assertEqual(self.scheduler.adaptive_stopping, False)
 
     def test_on_train_batch_begin(self):
         self.scheduler.on_train_batch_begin(0)
