@@ -1,7 +1,7 @@
 mne
 matplotlib
 mne
-tensorflow
+tensorflow[and-cuda]
 imblearn
 yaml
 pyyaml
