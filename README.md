@@ -105,6 +105,13 @@ Future work includes exploring different upsampling techniques and machine learn
   - ✅ Modularity 
   - ✅ Expandable multi class structure
   - ✅ Static helpers
+- Assessment and improvement of the results
+  - Visual representation
+  - Statistical tests
+  - CSP implementation
+  - XDAWN implementation
+- Wiki page with explanations
+- Docker refinement
 - Demo notebook
 
 ## Notes about testing
