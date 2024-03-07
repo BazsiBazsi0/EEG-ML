@@ -31,14 +31,10 @@ The dataset used in this project is the [EEG Motor Movement/Imagery Dataset](htt
 
 ## Methodology
 
-1. **Data Preprocessing**: The EEG data is preprocessed to remove noise and make it suitable for the machine learning model.
+1. **Data Preprocessing**: The EEG data is preprocessed for the machine learning model.
 2. **Synthetic Data Upsampling**: To address the issue of class imbalance, synthetic data upsampling is performed(SMOTE). This helps in balancing the classes and provides more data for the model to learn from.
 3. **Model Training**: A machine learning model is trained using TensorFlow. The model is trained on the upsampled dataset.
 4. **Model Evaluation**: The performance of the model is evaluated on a separate test set.
-
-## Results
-The individual results are in the results folder in their respective folder.
-
 
 ## Code Usage
 
