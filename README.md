@@ -42,13 +42,17 @@ The individual results are in the results folder in their respective folder.
 
 ## Code Usage
 
-For the first time running its gonna take some time to download the raw dataset and generate the filtered data.
+For the first time running it will take some time to download the raw dataset and generate the filtered data.
 
 To run the code use linux or WSL, and follow these steps:
 
-0. pray
+<details>
+<summary> Important note if having difficulties with TensorFlow!</summary>
 
 There are many problems currently with the Tensorflow package, the easiest way running it with GPU acceleration is in a Colab or Kaggle notebook. Currently a demo notebook is on the way, once the code refactoring is finished. If you are lucky and everything is right you can run it in docker (after installing the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)) or in a venv.
+
+</details>
+
 
 ### Docker
 1. Clone the repository.
@@ -89,23 +93,20 @@ python3 main.py
 
 The use of synthetic data upsampling significantly improved the performance of the machine learning model on the imbalanced EEG Motor Movement/Imagery Dataset. The individual results are in the "Results" folder.
 
-*Important Note: after I validated my results rigorously in 2023 and 2024 I discovered a severe error in the data filtration process which resulted the FCN-SMOTE combination to have inflated accuracy scores across all levels. Full post mortem to be released later.*
+*Important Note: after I validated my results rigorously in 2023 and 2024 I discovered a severe error in the data filtration process which resulted the FCN-SMOTE combination to have inflated accuracy scores across all levels. The impocat on the results are under investigation.*
 
 ## Future Work
 
 Future work includes exploring different upsampling techniques and machine learning models to further improve the performance. Currently I'm working on getting things into a better shape including visuals. Docker deployment and a simple showcase jupyter notebook is also on the todo list.
 
 ## TODO
-- High percentage testing coverage, coverage report
-    - utils test created, basic utils are covered
-    - test coverage report implemented
-    - Goal is to get it above 50% then eventually 90%+
+- ✅ High percentage testing coverage, coverage report
+- ✅ Classes better OOP structure
+  - ✅ Modularity 
+  - ✅ Expandable multi class structure
+  - ✅ Static helpers
 - Demo notebook
-- Classes
-  - preprocessing and core logic: WIP
-  - dataset generation implemented
-- Modularity and expandable multi class structure
-  - utils implemented - currently under revision and testing
+
 ## Notes about testing
 - Due to version differences and overall discrepancy over the years/months with the python test discovery inside vscode, it is recommended to put the following inside your `settings.json` file:
 ```json
