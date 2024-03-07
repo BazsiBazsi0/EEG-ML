@@ -53,3 +53,24 @@ class TestFileProcessor(unittest.TestCase):
 
         # Check if x_smote and y_smote have the same number of samples
         self.assertEqual(x_smote.shape[0], y_smote.shape[0])
+
+    def test_remove_majority_class(self):
+        x = np.random.rand(100, 10)
+        y = np.zeros((100, 2))
+        y[:50, 0] = 1  # Class 0 is the majority
+        y[50:, 1] = 1  # Class 1 is the minority
+
+        new_x, new_y = FileProcessor.remove_majority_class(x, y)
+
+        # Check if the majority class has been removed
+        self.assertEqual(new_y.shape[1], y.shape[1] - 1)
+
+        # Check if the number of samples in new_x and new_y are equal to the number of samples in the minority class
+        self.assertEqual(new_x.shape[0], np.sum(y[:, 1]))
+        self.assertEqual(new_y.shape[0], np.sum(y[:, 1]))
+
+        # Check if the second dimension of new_x is the same as x
+        self.assertEqual(new_x.shape[1], x.shape[1])
+
+        # Check if the values in new_y are all 1 (since the majority class has been removed)
+        self.assertTrue(np.all(new_y == 1))
