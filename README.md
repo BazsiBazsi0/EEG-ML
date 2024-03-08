@@ -49,22 +49,6 @@ There are many problems currently with the Tensorflow package, the easiest way r
 
 </details>
 
-
-### Docker
-1. Clone the repository.
-2. Build the dockerfile.
-```
-sudo docker build -t EEG-ML .
-```
-1. Run the docker image and mount your working folder
-```
-docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace EEG-ML:latest
-```
-1. Run the main script.
-```
-python3 main.py
-```
-
 ### Local
 Make a virtual environment
 ```
@@ -81,6 +65,21 @@ pip install -r requirements.txt
 ```
 Run the main script
 
+```
+python3 main.py
+```
+
+### Docker
+1. Clone the repository.
+2. Build the dockerfile.
+```
+sudo docker build -t EEG-ML .
+```
+1. Run the docker image and mount your working folder
+```
+docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace EEG-ML:latest
+```
+1. Run the main script.
 ```
 python3 main.py
 ```
