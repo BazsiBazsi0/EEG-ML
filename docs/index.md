@@ -8,7 +8,7 @@ hero:
   tagline: EEG-ML is a proof of concept for high precision classification of movement associated brainwaves.
 
   image:
-    src: /brain.webp
+    src: /docs/brain.webp
     alt: EEG-ML
 
   actions:
