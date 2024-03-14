@@ -5,3 +5,4 @@ logs
 htmlcov
 Results
 docs/.vitepress/cache
+docs/.vitepress/dist
