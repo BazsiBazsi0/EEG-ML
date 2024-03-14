@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: "/EEG-ML/",
   title: "EEG-ML",
   description: "EEG-ML is a proof of concept project for high precision classification of movement associated brainwaves.",
   themeConfig: {
