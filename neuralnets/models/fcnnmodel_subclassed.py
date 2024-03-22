@@ -113,7 +113,6 @@ class FCNNModel(tf.keras.Model):
         validation_freq=1,
         max_queue_size=10,
         workers=1,
-        use_multiprocessing=False,
     ):
 
         # Calculate steps_per_epoch
@@ -150,7 +149,6 @@ class FCNNModel(tf.keras.Model):
             validation_freq,
             max_queue_size,
             workers,
-            use_multiprocessing,
         )
 
         return self.history
