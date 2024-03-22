@@ -35,7 +35,7 @@ class TestFCNNModel(unittest.TestCase):
 
     def test_call(self):
         # Create a random tensor to pass to the call method
-        input_tensor = tf.random.uniform((1, 64, 64, 1))
+        input_tensor = tf.random.uniform((1, 641, self.electrodes, 1))
         output_tensor = self.model.call(input_tensor)
 
         # Check that the output is a tensor
