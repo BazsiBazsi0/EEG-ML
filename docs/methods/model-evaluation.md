@@ -1,0 +1,1 @@
+The models were 10-fold cross-validated, and the results were averaged, graphed and detailed in the results section. The ROC curve was plotted for each model, and the AUC was calculated. The models were then tested on the test set, and the results were compared to the training set to ensure that the model was not overfitting.

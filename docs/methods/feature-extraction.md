@@ -1,0 +1,1 @@
+Originally there were no extra feature extraction steps, but later i added CSP and XDAWN. This was to increase the accuracy of the model.

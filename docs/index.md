@@ -14,7 +14,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /getting-started/introduction
+      link: /getting-started/getting-started
     - theme: alt
       text: View on GitHub
       link: https://github.com/bkutasi/EEG-ML

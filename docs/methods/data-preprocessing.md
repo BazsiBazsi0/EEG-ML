@@ -1,0 +1,7 @@
+- **Artifact Removal**: Elimination of artifacts from electrode placement errors, body motions, and ambient noise.
+- **Data Normalization**: Ensuring all electrodes contribute equally to the final result through normalization.
+- **Filtering**: Application of filters to the EEG data to isolate relevant signal frequencies.
+- **Fast Fourier Transform (FFT)**: Use of FFT for frequency domain analysis, combined with oversampling techniques.
+- **EEG Channel Selection**: Reduction of data complexity by selecting the most informative EEG channels.
+- **Synthetic Minority Over-sampling Technique (SMOTE)**: Balancing class distribution by creating synthetic data points similar to the minority classes.
+- **1D-CNN**: Implementation of One Dimensional Convolutional Network for feature extraction from EEG signals.
