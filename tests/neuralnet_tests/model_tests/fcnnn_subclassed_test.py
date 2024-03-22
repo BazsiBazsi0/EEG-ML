@@ -35,14 +35,14 @@ class TestFCNNModel(unittest.TestCase):
 
     def test_call(self):
         # Create a random tensor to pass to the call method
-        input_tensor = tf.random.uniform((1, 641, self.electrodes, 1))
+        input_tensor = np.random.random((10, 641, self.electrodes, 1))
         output_tensor = self.model.call(input_tensor)
 
         # Check that the output is a tensor
         self.assertIsInstance(output_tensor, tf.Tensor)
 
         # Check that the output shape is as expected
-        self.assertEqual(output_tensor.shape, (1, 5))
+        self.assertEqual(output_tensor.shape, (10, 5))
 
     def test_fit(self):
         # Fit the model, note batch size is 10 - the size of the training data
