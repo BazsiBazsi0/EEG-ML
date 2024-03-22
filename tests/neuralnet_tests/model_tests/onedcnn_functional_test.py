@@ -21,7 +21,7 @@ class TestOneDCNNModel(unittest.TestCase):
         model.build((None, 641, self.electrodes))
 
         # Check if the input shape of the model is (None, 641, electrodes)
-        input_shape = model.layers[0].input_shape[0]
+        input_shape = model.layers[0]._batch_input_shape
         self.assertEqual(input_shape, (None, 641, self.electrodes))
 
     def test_create_and_compile_sequential_tune(self):
