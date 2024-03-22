@@ -63,7 +63,7 @@ class FCNNModel(Model):
         model.compile(
             loss="categorical_crossentropy",
             optimizer=GradAugAdam(learning_rate=0.0001, noise_stddev=0.01),
-            metrics=["accuracy"],
+            metrics=model.metrics + ["accuracy"],
         )
 
         return model
