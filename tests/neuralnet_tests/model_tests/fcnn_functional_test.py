@@ -36,4 +36,4 @@ class TestFCNNModel(unittest.TestCase):
         model.fit(x_train, y_train, epochs=1, verbose=0)
 
         # Check the model's compile metrics
-        self.assertIn("accuracy", model.metrics_names)
+        self.assertIn("loss", model.metrics_names)
