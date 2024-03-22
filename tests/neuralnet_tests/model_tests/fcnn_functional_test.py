@@ -1,4 +1,5 @@
 import unittest
+import numpy as np
 import tensorflow as tf
 from neuralnets.models.fcnnmodel_functional import FCNNModel
 from neuralnets.training_utils.grad_aug_adam import GradAugAdam
@@ -26,11 +27,13 @@ class TestFCNNModel(unittest.TestCase):
         # Check the type of the first layer
         self.assertIsInstance(model.layers[0], tf.keras.layers.InputLayer)
 
+        # Create dummy data
+        x_train = np.random.random((100, 641, self.electrodes, 1))
+        y_train = np.random.randint(5, size=(100, 1))
+        y_train = tf.keras.utils.to_categorical(y_train, num_classes=5)
+
+        # Train the model for one epoch
+        model.fit(x_train, y_train, epochs=1, verbose=0)
+
         # Check the model's compile metrics
-        self.assertTrue(
-            any(
-                metric
-                for metric in model.compiled_metrics._metrics
-                if metric == "accuracy"
-            )
-        )
+        self.assertIn("accuracy", model.metrics_names)
