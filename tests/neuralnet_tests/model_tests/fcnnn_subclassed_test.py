@@ -21,7 +21,7 @@ class TestFCNNModel(unittest.TestCase):
 
     def test_create_and_compile(self):
         self.assertIsInstance(self.model, tf.keras.Model)
-        self.assertEqual(self.model.name, f"FCNN_ch_level_{self.load_level}")
+        self.assertEqual(self.model._name, f"FCNN_ch_level_{self.load_level}")
         self.assertEqual(self.model.loss, tf.keras.losses.categorical_crossentropy)
 
         # Check the optimizer
