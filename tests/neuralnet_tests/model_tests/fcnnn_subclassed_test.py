@@ -8,7 +8,9 @@ class TestFCNNModel(unittest.TestCase):
     def setUp(self):
         self.load_level = 0
         self.electrodes = 7
-        self.model = FCNNModel.create_and_compile(self.load_level, self.electrodes)
+        self.model = FCNNModel.create_and_compile(
+            load_level=self.load_level, electrodes=self.electrodes
+        )
 
         # Create some random training data
         self.x_train = np.random.rand(10, 641, self.electrodes)
