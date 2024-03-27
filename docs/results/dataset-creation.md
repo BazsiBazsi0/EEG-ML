@@ -1,5 +1,7 @@
 The dataset was created from the labels os PhysioNet Movement/Imagery dataset. The dataset was created by using the following steps:
 - Extraction of labels from the dataset using MNE
+- Filtering between 0 and 38 Hz
+- Using the whole 5 second epochs
 - Transitioning to numpy after MNE processing
 - Creation of x and y datasets, where x is the EEG data samples and y is the labels
 - Creation of a numpy array with the labels

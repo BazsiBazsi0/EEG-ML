@@ -2,11 +2,11 @@ There are some important changes that were made to the original code. The most i
 - The code was refactored to be more modular and easier to understand.
 - The code was updated to use the latest version of TensorFlow and Keras.
 - The processing is refined and the code is optimized for better performance and understandability.
-- The training is per patient instead of a generic model on the whole dataset.
 - The final dimensions of the model are changed to be more suitable for the data, swapped from epochs x channels x samples to epochs x samples x channels.
+- Originally I used 4 second from the 5 second epochs, but I changed it to include all the five seconds of the epochs. This lead to a significant improvement in classification scores.
 
 Problems i encountered and recommendations:
-- While the neural network structure is sufficiently complex, the model is not able to learn the features of the data in a way that is useful for classification. This is likely due to the small size of the dataset and the complexity of the features.
+- While the neural network structure is sufficiently complex, the model cannot learn to classify the data until perfection. This is likely due to the small size of the dataset and the complexity of the features.
 - When applying SMOTE the model doesn't learn the features of the dataset better, it just learns the synthetic data.
     - This can be explain by the fact that the synthetic data is not representative of the real data.
     - The model learns whats similar and frequent between examples and not the "features" of the data.
