@@ -13,9 +13,13 @@
  </a>
 </p>
 
+
+
 ## Introduction
 
 This project uses machine learning techniques to analyze and classify EEG Motor Movement/Imagery Dataset from PhysioNet. This code was initially written as a part of my MSc thesis and later improved while keeping the initial logic and idea the same.
+  
+All important information is in the [Documentation](https://bkutasi.github.io/EEG-ML/)
 
 ## Use case
 
@@ -103,9 +107,7 @@ Future work includes exploring different upsampling techniques and machine learn
 - Assessment and improvement of the results
   - Visual representation
   - Statistical tests
-  - CSP implementation
-  - XDAWN implementation
-- Wiki page with explanations
+- ✅ Wiki page with explanations
 - Docker refinement
 - Demo notebook
 
