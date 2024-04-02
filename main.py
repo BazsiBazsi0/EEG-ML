@@ -35,10 +35,10 @@ if __name__ == "__main__":
     dataset_utils.generate()
 
     # Data loading, load_level parameter is the level of electrodes to be used(0: lowest, 3: highest)
-    load_level = 0
+    load_level = 2
 
     # Loading the saved files
-    x, y = fileloader.FileLoader.load_saved_files(load_level)
+    x, y = fileloader.FileLoader.load_saved_files(load_level, patient_id=None)
 
     # Pre-processing the variables
     FileProcessor = FileProcessor(x, y)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # Data loading and preprocessing done, time to train the model
     # TODO: Document kfold, Plateou LR reduction(0.0001 and try later 0.00001) and later OneCycleScheduler
-    histories, models = modeltrainer.NeuralNets.k_fold_validation(
+    histories, models = modeltrainer.ModelTrainer.k_fold_validation(
         x,
         y,
         k=4,
