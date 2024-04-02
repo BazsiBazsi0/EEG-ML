@@ -1,5 +1,5 @@
 import numpy as np
-import config
+import utils.config as config
 from typing import List
 import os
 
@@ -18,6 +18,7 @@ class FileLoader:
     @staticmethod
     def load_saved_files(
         electrodes_load_level: int = 0,
+        patient_id: int = None,
     ):
         """
         Loads the saved files from the dataset path.
@@ -28,6 +29,7 @@ class FileLoader:
 
         Args:
             electrodes_load_level (int): The level of electrode channel inclusion. Defaults to 0.
+            patient_id (int): The ID of the patient to load. Defaults to None, which loads all patients.
 
         Returns:
             tuple: A tuple containing the loaded x and y data arrays.
@@ -52,8 +54,9 @@ class FileLoader:
 
         xs, ys = [], []
         for s in subjects:
-            xs.append(np.load(f"{filtered_data_path}/x_sub_{s}.npy"))
-            ys.append(np.load(f"{filtered_data_path}/y_sub_{s}.npy"))
+            if patient_id is None or s == patient_id:
+                xs.append(np.load(f"{filtered_data_path}/x_sub_{s}.npy"))
+                ys.append(np.load(f"{filtered_data_path}/y_sub_{s}.npy"))
 
         x = np.concatenate(xs)
         y = np.concatenate(ys)
