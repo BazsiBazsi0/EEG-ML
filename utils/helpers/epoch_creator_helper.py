@@ -8,7 +8,7 @@ class EpochCreatorHelper:
         events,
         event_id,
         tmin=0,
-        tmax=4,
+        tmax=5,
         proj=True,
         picks=None,
         baseline=None,
