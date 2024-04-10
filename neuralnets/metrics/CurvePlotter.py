@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from sklearn.metrics import roc_curve, roc_auc_score
 import matplotlib.pyplot as plt
 
@@ -111,22 +112,20 @@ class CurvePlotter:
         None
         """
         num_models = len(models)
-        num_rows = (num_models + 1) // 2  # Calculate the number of rows
+        num_rows = (num_models + 1) // 2
         fig, axes = plt.subplots(num_rows, 2, figsize=(12, 6 * num_rows))
 
-        # Get the model name
-        model_name = models[0].name
+        if num_rows == 1:
+            axes = np.expand_dims(axes, axis=0)
 
-        # Create a directory for the model under "Results" if it doesn't exist
+        model_name = models[0].name
         model_dir = os.path.join(results_dir, model_name)
         os.makedirs(model_dir, exist_ok=True)
-
-        # Define the file name
         file_name = os.path.join(model_dir, model_name)
 
         for i, model in enumerate(models):
-            row = i // 2  # Calculate the row index
-            col = i % 2  # Calculate the column index
+            row = i // 2
+            col = i % 2
 
             labels = ["Left", "Right", "Fists", "Rest", "Feet"]
             y_pred = model.predict(x)
