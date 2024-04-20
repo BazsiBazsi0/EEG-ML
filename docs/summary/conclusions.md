@@ -1,1 +1,4 @@
-Conclusions soon.
+Synthetic data creation is a useful tool but in the case of highly complex datasets, it may not be sufficient. In my testing using synthetically upsampled data did not lead to worthwhile results, and the model was not able to generalize well. This is likely due to the fact that the model was not able to learn the underlying patterns in the data, and instead learned the patterns in the synthetic data. This led to the model not being able to generalize well to the test set. This is a common problem in machine learning, and it is important to be aware of it when using synthetic data.
+
+    
+Regarding the two implemented proposed models and training pipelines, the FCNN model show potential for the future. The 1D-CNN was not sufficiently complex to learn the spatial features of the data and it was a bad performer. The 1-Dimensional structures are still worth investigating as they provide superior speed and efficiency over more complex 2D and 3D neural model structures. 

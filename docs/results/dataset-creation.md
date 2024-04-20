@@ -8,3 +8,5 @@ The dataset was created from the labels os PhysioNet Movement/Imagery dataset. T
 - Saving the x and y datasets as numpy arrays
 
 Additionally the dataset the number of classes either equalized or oversampled using SMOTE. The dataset was then split into training and testing sets. The training set was used to train the models, and the testing set was used to evaluate the models. The dataset was then saved as a numpy array for future use.
+
+The dataset is re-creatable by running the code until the _generate_ method of the _dataset_utils_ class.

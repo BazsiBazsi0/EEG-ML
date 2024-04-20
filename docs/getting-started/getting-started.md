@@ -2,7 +2,8 @@
 
 This project uses machine learning techniques to analyze and classify EEG Motor Movement/Imagery Dataset from PhysioNet. This code was initially written as a part of my MSc thesis and later improved while keeping the initial logic and idea the same.
 
-::: danger I made some changes to my original code, so the results may differ from the original ones. Everything is documented in [Important Changes](/getting-started/important-changes) 
+::: danger
+I made some changes to my original code, I did a total refactor and streamlined the results. Everything is documented in [Important Changes](/getting-started/important-changes) 
 :::
 
 ## Use case
@@ -22,4 +23,4 @@ To address the class imbalance, this project utilizes synthetic data upsampling 
 
 ## Model Training and Evaluation
 
-After upsampling the dataset, machine learning models are trained using various algorithms, such as Common Spacial Patterns, XDAWN and Neural Networks. The models are evaluated using metrics such as accuracy, precision, recall, and F1-score to assess their performance in classifying the EEG motor movement/imagery data.
+After upsampling the dataset, machine learning models are trained using various algorithms. The models are evaluated using metrics such as accuracy, precision, recall, and F1-score to assess their performance in classifying the EEG motor movement/imagery data.

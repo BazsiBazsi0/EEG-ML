@@ -1,1 +1,1 @@
-The models were trained for 50 epoch with the OneCycleScheduler method and were saved.
+The models were trained for 50 epoch with [OneCycleScheduler](https://arxiv.org/abs/1803.09820) method and were saved.
