@@ -1,5 +1,6 @@
 from tensorflow.keras import Model
 from neuralnets.training_utils.grad_aug_adam import GradAugAdam
+from tensorflow.keras.regularizers import l1
 from tensorflow.keras.layers import (
     Input,
     Conv2D,
@@ -18,10 +19,10 @@ class FCNNModel(Model):
 
     def create_and_compile_functional(load_level: int, electrodes: int) -> Model:
         # Define dropout rate
-        drop_rate = 0.5
+        drop_rate = 0.75
 
         # Define input shape
-        inputs = Input(shape=(641, electrodes, 1))
+        inputs = Input(shape=(801, electrodes, 1))
 
         # Start of the model layers
         x = Conv2D(32, (3, 3), padding="same")(inputs)
@@ -46,7 +47,7 @@ class FCNNModel(Model):
         x = LeakyReLU()(x)
         x = Dropout(drop_rate)(x)
         x = Flatten()(x)
-        x = Dense(64)(x)
+        x = Dense(64, kernel_regularizer=l1(0.001))(x)
         x = LeakyReLU()(x)
         x = BatchNormalization()(x)
         x = Dropout(drop_rate)(x)

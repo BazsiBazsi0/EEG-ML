@@ -1,5 +1,6 @@
 import tensorflow as tf
 from neuralnets.training_utils.grad_aug_adam import GradAugAdam
+from tensorflow.keras.regularizers import l1
 from tensorflow.keras import Model, Input
 from tensorflow.keras.layers import (
     Conv1D,
@@ -8,6 +9,8 @@ from tensorflow.keras.layers import (
     AvgPool1D,
     Flatten,
     Dense,
+    Dropout,
+    MaxPooling1D,
 )
 from tensorflow.keras.models import Sequential
 
@@ -21,9 +24,10 @@ class OneDCNNModel(tf.keras.Model):
         load_level: int, electrodes: int
     ) -> tf.keras.Model:
         drop_rate = 0.5
+        secondary_drop_rate = 0.25
 
         # Input layer
-        inputs = Input(shape=(641, electrodes))
+        inputs = Input(shape=(801, electrodes))
 
         # Convolutional layers
         x = Conv1D(filters=32, kernel_size=20, activation="relu", padding="same")(
@@ -38,13 +42,23 @@ class OneDCNNModel(tf.keras.Model):
         x = Conv1D(filters=32, kernel_size=6, activation="relu", padding="valid")(x)
         x = SpatialDropout1D(drop_rate)(x)
 
+        # TODO Added more layers to the model
+        x = Conv1D(64, kernel_size=3, activation="relu")(x)
+        x = MaxPooling1D(pool_size=2)(x)
+        x = Conv1D(128, kernel_size=3, activation="relu")(x)
+        x = MaxPooling1D(pool_size=2)(x)
+
         # Flatten layer
         x = Flatten()(x)
 
         # Fully connected layers
-        x = Dense(296, activation="relu")(x)
-        x = Dense(148, activation="relu")(x)
-        x = Dense(74, activation="relu")(x)
+        # TODO Added L1 regularization
+        x = Dense(296, activation="relu", kernel_regularizer=l1(0.001))(x)
+        x = Dropout(secondary_drop_rate)(x)
+        x = Dense(148, activation="relu", kernel_regularizer=l1(0.001))(x)
+        x = Dropout(secondary_drop_rate)(x)
+        x = Dense(74, activation="relu", kernel_regularizer=l1(0.001))(x)
+        x = Dropout(secondary_drop_rate)(x)
 
         # Output layer
         outputs = Dense(5, activation="softmax")(x)

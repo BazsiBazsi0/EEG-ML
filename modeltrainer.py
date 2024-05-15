@@ -57,7 +57,7 @@ class ModelTrainer:
             steps_per_epoch = len(X_train) // batch_size
 
             scheduler = OneCycleScheduler(
-                max_lr=0.0001,
+                max_lr=0.001,
                 steps_per_epoch=steps_per_epoch,
                 epochs=epochs,
                 verbose=1,
@@ -79,7 +79,7 @@ class ModelTrainer:
             histories.append(history)
             # Clear the session and delete the model to free up memory(avoids OOM errors)
             K.clear_session()
-            del model
+            del model, history
             # must add garbage collection manually to avoid holding the mem of the deleted model
             gc.collect()
 

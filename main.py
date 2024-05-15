@@ -8,11 +8,10 @@ from utils.dataset_download_utils import Downloader
 from utils.dataset_utils import DatasetUtils
 from utils import logging_utils
 from neuralnets.eval.ModelEvaluator import ModelEvaluator
-from neuralnets.plotters.DataVisualizer import DataVisualizer
+from neuralnets.plotters.MetricsVisualizer import MetricsVisualizer
 from fileprocessor import FileProcessor
 
 if __name__ == "__main__":
-
     # Only use the first available gpu/device
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -35,7 +34,7 @@ if __name__ == "__main__":
     dataset_utils.generate()
 
     # Data loading, load_level parameter is the level of electrodes to be used(0: lowest, 3: highest)
-    load_level = 2
+    load_level = 0
 
     # Loading the saved files
     x, y = fileloader.FileLoader.load_saved_files(load_level, patient_id=None)
@@ -49,7 +48,7 @@ if __name__ == "__main__":
     histories, models = modeltrainer.ModelTrainer.k_fold_validation(
         x,
         y,
-        k=4,
+        k=10,
         epochs=50,
         model_name="OneDCNN",
         load_level=load_level,
@@ -69,3 +68,7 @@ if __name__ == "__main__":
         ["save", "curves", "metrics", "roc_curve"],
         results_dir="Results",
     )
+
+    visualizer = MetricsVisualizer("Results")
+    visualizer.plot_accuracy()
+    visualizer.plot_loss()
