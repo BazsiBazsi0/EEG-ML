@@ -56,7 +56,7 @@ class FileProcessor:
         )
         """
         # Commented out smote processing to save memory
-        x_smote, y_smote = 0, 0
+        # x_smote, y_smote = 0, 0
         self.x = np.reshape(
             self.x,
             (self.x.shape[0], self.x.shape[1] // x_shape[1], x_shape[1]),
@@ -68,7 +68,7 @@ class FileProcessor:
         # Equalize the data
         self.x, self.y = FileProcessor.equalize_samples(self.x, self.y)
 
-        return self.x, self.y, x_smote, y_smote, x_val, y_val
+        return self.x, self.y, x_val, y_val
 
     @staticmethod
     def to_one_hot(y):

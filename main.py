@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # Pre-processing the variables
     FileProcessor = FileProcessor(x, y)
-    x, y, x_smote, y_smote, x_val, y_val = FileProcessor.preprocessor()
+    x, y, x_val, y_val = FileProcessor.preprocessor()
 
     # Data loading and preprocessing done, time to train the model
     # TODO: Document kfold, Plateou LR reduction(0.0001 and try later 0.00001) and later OneCycleScheduler

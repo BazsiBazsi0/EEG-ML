@@ -95,7 +95,7 @@ class OneDCNNModel(tf.keras.Model):
                 kernel_size=kernel_size,
                 activation="relu",
                 padding="same",
-                input_shape=(641, electrodes),
+                input_shape=(801, electrodes),
             )
         )
         model.add(BatchNormalization())

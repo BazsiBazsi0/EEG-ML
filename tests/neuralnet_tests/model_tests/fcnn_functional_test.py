@@ -28,7 +28,7 @@ class TestFCNNModel(unittest.TestCase):
         self.assertIsInstance(model.layers[0], tf.keras.layers.InputLayer)
 
         # Create dummy data
-        x_train = np.random.random((100, 641, self.electrodes, 1))
+        x_train = np.random.random((100, 801, self.electrodes, 1))
         y_train = np.random.randint(5, size=(100, 1))
         y_train = tf.keras.utils.to_categorical(y_train, num_classes=5)
 

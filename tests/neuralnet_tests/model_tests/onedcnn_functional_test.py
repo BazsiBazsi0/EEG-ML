@@ -18,11 +18,11 @@ class TestOneDCNNModel(unittest.TestCase):
         self.assertEqual(model.loss, tf.keras.losses.categorical_crossentropy)
 
         # Build the model with an input shape
-        model.build((None, 641, self.electrodes))
+        model.build((None, 801, self.electrodes))
 
         # Check if the input shape of the model is (None, 641, electrodes)
         input_shape = model.layers[0]._batch_input_shape
-        self.assertEqual(input_shape, (None, 641, self.electrodes))
+        self.assertEqual(input_shape, (None, 801, self.electrodes))
 
     def test_create_and_compile_sequential_tune(self):
         hp = HyperParameters()
@@ -37,7 +37,7 @@ class TestOneDCNNModel(unittest.TestCase):
         self.assertEqual(model.loss, tf.keras.losses.categorical_crossentropy)
 
         # Build the model with an input shape
-        model.build((None, 641, self.electrodes))
+        model.build((None, 801, self.electrodes))
 
         # Check the number and types of layers in the model
         self.assertGreater(len(model.layers), 0)
