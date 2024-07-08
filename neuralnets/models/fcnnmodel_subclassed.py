@@ -108,11 +108,6 @@ class FCNNModel(tf.keras.Model):
         sample_weight=None,
         initial_epoch=0,
         steps_per_epoch=None,
-        validation_steps=None,
-        validation_batch_size=None,
-        validation_freq=1,
-        max_queue_size=10,
-        workers=1,
     ):
 
         # Calculate steps_per_epoch
@@ -144,11 +139,6 @@ class FCNNModel(tf.keras.Model):
             sample_weight,
             initial_epoch,
             steps_per_epoch,
-            validation_steps,
-            validation_batch_size,
-            validation_freq,
-            max_queue_size,
-            workers,
         )
 
         return self.history
