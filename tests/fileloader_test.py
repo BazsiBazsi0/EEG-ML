@@ -1,7 +1,6 @@
 import unittest
 from unittest import mock
 import numpy as np
-import os
 from fileloader import FileLoader
 
 
