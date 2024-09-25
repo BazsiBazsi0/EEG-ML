@@ -77,22 +77,29 @@ python3 main.py
 1. Clone the repository.
 2. Build the dockerfile.
 ```
-sudo docker build -t EEG-ML .
+docker build -t EEG-ML .
 ```
-1. Run the docker image and mount your working folder
+3. Run the docker image and mount your working folder
 ```
-docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace EEG-ML:latest
+docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace eeg-ml
 ```
-1. Run the main script.
+4. Run the main script.
 ```
 python3 main.py
 ```
+If you already have the dataset:
+```
+docker run --rm -it -p 8888:8888/tcp -v ${PWD}:/workspace -v ${PWD}/dataset:/workspace/dataset eeg-ml
+```
+
+This setup will:
+- Mount your current directory to /workspace
+- Mount your existing dataset folder to prevent redownloading
+- Use GPU acceleration if available
 
 ## Results
 
-The use of synthetic data upsampling significantly improved the performance of the machine learning model on the imbalanced EEG Motor Movement/Imagery Dataset. The individual results are in the "Results" folder.
-
-*Important Note: after I validated my results rigorously in 2023 and 2024 I discovered a severe error in the data filtration process which resulted the FCN-SMOTE combination to have inflated accuracy scores across all levels. The impocat on the results are under investigation.*
+The restults are explained in the [Documentation](https://bkutasi.github.io/EEG-ML/)
 
 ## Future Work
 
