@@ -79,6 +79,7 @@ python3 main.py
 ```
 
 ### Docker (untested!)
+1. Make sure you have the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) installed.
 2. Build the dockerfile.
 ```
 docker build -t eeg-ml .
