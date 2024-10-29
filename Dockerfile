@@ -1,5 +1,5 @@
 # Use NVIDIA's official TensorFlow container as base
-FROM nvcr.io/nvidia/tensorflow:24.06-tf2-py3
+FROM nvcr.io/nvidia/tensorflow:24.10-tf2-py3
 
 # Set working directory
 WORKDIR /workspace
@@ -28,8 +28,8 @@ RUN pip install --no-cache-dir \
     matplotlib \
     keras-tuner
 
-# Copy project files
-COPY . .
+# Copy project files, only use it if you dont mount the project directory
+#COPY . .
 
 # Set Python path
 ENV PYTHONPATH=/workspace
