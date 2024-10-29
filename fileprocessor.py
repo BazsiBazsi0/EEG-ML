@@ -14,6 +14,28 @@ class FileProcessor:
         self.y_resampled = None
 
     def preprocessor(self):
+        """
+        Preprocess the input data for machine learning tasks.
+
+        This method performs several preprocessing steps on the input data:
+        1. Reshapes the input data from 3D to 2D
+        2. Normalizes the data using StandardScaler
+        3. Applies min-max scaling
+        4. Performs one-hot encoding on the labels
+        5. Splits the data into training and validation sets
+        6. Reshapes the data back to 3D format
+        7. Equalizes the samples across classes
+
+        Returns:
+            tuple: A tuple containing four elements:
+                - self.x (numpy.ndarray): Preprocessed training input data
+                - self.y (numpy.ndarray): Preprocessed training labels
+                - x_val (numpy.ndarray): Preprocessed validation input data
+                - y_val (numpy.ndarray): Preprocessed validation labels
+
+        Note:
+            This method modifies the `x` and `y` attributes of the FileProcessor instance.
+        """
         # Reshaping to 2D to complete basic preprocessing
         x_shape = self.x.shape
         self.x = np.reshape(
