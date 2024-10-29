@@ -42,7 +42,6 @@ if __name__ == "__main__":
     x, y, x_val, y_val = FileProcessor.preprocessor()
 
     # Data loading and preprocessing done, time to train the model
-    # TODO: Document kfold, Plateou LR reduction(0.0001 and try later 0.00001) and later OneCycleScheduler
     histories, models = modeltrainer.ModelTrainer.k_fold_validation(
         x,
         y,

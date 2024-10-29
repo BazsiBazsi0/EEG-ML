@@ -43,7 +43,6 @@ class FileProcessor:
         )
 
         # Normalize the data
-        # TODO: Document changes
         scaler = StandardScaler()
         self.x = scaler.fit_transform(self.x)
 

@@ -111,11 +111,11 @@ Future work includes exploring different upsampling techniques and machine learn
   - ✅ Modularity 
   - ✅ Expandable multi class structure
   - ✅ Static helpers
-- Assessment and improvement of the results
-  - Visual representation
-  - Statistical tests
+- ✅Assessment and improvement of the results
+  - ✅Visual representation
+  - ✅Statistical tests
 - ✅ Wiki page with explanations
-- Docker refinement
+- ✅Docker refinement
 - Demo notebook
 
 ## Notes about testing
