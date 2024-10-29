@@ -1,8 +1,6 @@
 import os
-import numpy as np
 import fileloader
 import modeltrainer
-import tensorflow as tf
 import utils.config as config
 from utils.dataset_download_utils import Downloader
 from utils.dataset_utils import DatasetUtils
