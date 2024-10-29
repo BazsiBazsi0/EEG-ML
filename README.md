@@ -73,11 +73,11 @@ Run the main script
 python3 main.py
 ```
 
-### Docker
+### Docker (untested!)
 1. Clone the repository.
 2. Build the dockerfile.
 ```
-docker build -t EEG-ML .
+docker build -t eeg-ml .
 ```
 3. Run the docker image and mount your working folder
 ```
@@ -99,7 +99,7 @@ This setup will:
 
 ## Results
 
-The restults are explained in the [Documentation](https://bkutasi.github.io/EEG-ML/)
+The results are explained in the [Documentation](https://bkutasi.github.io/EEG-ML/)
 
 ## Future Work
 
