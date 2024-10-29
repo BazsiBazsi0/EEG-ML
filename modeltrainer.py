@@ -10,8 +10,7 @@ from typing import List
 
 
 class ModelTrainer:
-    # TODO: Testing and fix the ci/cd for the tests on github actions
-    # https://theaisummer.com/unit-test-deep-learning/
+
     @staticmethod
     def k_fold_validation(
         X,
@@ -24,8 +23,25 @@ class ModelTrainer:
         shuffle: bool = True,
     ):
         """
-        Function to execute k-fold cross validation on the data with the picked model.
-        Model: Either "FCNN" or "OneDCNN"
+        Performs k-fold cross-validation on the provided data using the specified model.
+
+        Args:
+            X: The input data.
+            y: The target labels.
+            k: The number of folds to use for cross-validation. Default is 10.
+            epochs: The number of epochs to train the model for each fold. Default is 50.
+            model_name: The name of the model to use. Must be either "FCNN" or "OneDCNN". Default is "".
+            load_level: The level of data loading to use. Default is 0.
+            electrodes: The number of electrodes to use. Default is 7.
+            shuffle: Whether to shuffle the data before splitting into folds. Default is True.
+
+        Returns:
+            Tuple[List[History], List[Model]]: A tuple containing:
+                - A list of training histories for each fold.
+                - A list of trained models for each fold.
+
+        Raises:
+            ValueError: If an invalid model name is provided.
         """
         models: List[object] = []
         histories: List[object] = []
@@ -87,6 +103,22 @@ class ModelTrainer:
 
     @staticmethod
     def benchmark_prediction(model, X, batch_size=32):
+        """
+        Benchmarks the prediction performance of a given model on input data.
+
+        This function measures the time taken to make predictions, calculates the
+        distribution of predicted classes, and prints performance statistics.
+
+        Args:
+            model: The trained model to use for predictions.
+            X: The input data to make predictions on.
+            batch_size (int, optional): The batch size to use for predictions. Defaults to 32.
+
+        Returns:
+            tuple: A tuple containing:
+                - predictions (numpy.ndarray): The raw predictions made by the model.
+                - elapsed_time_ms (float): The time taken to make predictions in milliseconds.
+        """
         # start the timer
         start_time = time.time()
 
